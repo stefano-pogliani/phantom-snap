@@ -5,7 +5,13 @@ var Q       = require("q");
 /**
  * An HTTP server to serve static files.
  * @class StaticServer
- * @param {!String} path The location of the static files.
+ * @param {!Object} options
+ *   An object with options to cusomise the behaviour of the server.
+ *   Options are:
+ *     * logger: An object implementing the logger interface.
+ *     * path (required): The path to the static files to serve.
+ *     * port: The port for the server to listen on (default: 8080).
+ *     
  */
 var StaticServer = module.exports = function(options) {
   this.app    = express();
