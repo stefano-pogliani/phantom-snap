@@ -2,7 +2,8 @@
  * @class Page
  * Abstract rapresentaion of a page.
  * 
- * @param {!String} uri The URI of the page being represented.
+ * @param {!String} uri   The URI of the page being represented.
+ * @param {=Number} depth The dinsance of this page from the main page. 
  */
 var Page = module.exports = function(uri, depth) {
   /**

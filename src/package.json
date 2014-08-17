@@ -4,7 +4,9 @@
   "description": "client side generated page snapshooting.",
 
   "dependencies": {
-    "express": "~4.8.4",
-    "q":       "~1.0.1"
+    "express":   "~4.8.4",
+    "phantomjs": "~1.9.7",
+    "q":         "~1.0.1",
+    "socket.io": "~1.0.6"
   }
 }

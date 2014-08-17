@@ -36,7 +36,7 @@ module.exports = function(grunt) {
       },
       all: [
         "src/**/*.js",
-        "!src/libs/**",
+        "!src/**/libs/**",
         "!src/node_modules/**"
       ]
     },
