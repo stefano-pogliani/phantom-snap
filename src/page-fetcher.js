@@ -47,9 +47,7 @@ PageFetcher.prototype._getPhantom = function() {
 PageFetcher.prototype.fetch = function(page) {
   var _this = this;
   return this._getPhantom().then(function(phantom) {
-    return phantom.fetch(_this.base + page.uri);
-  }).then(function(page_id) {
-    console.log(page_id);
+    return phantom.fetch(_this.base + page.uri, page);
   });
 };
 

@@ -9,6 +9,8 @@ define(function(require) {
    * @param {=Object} data  Optional data sent with the event.
    */
   var handleInEvent = function(event, identifier, data) {
+    console.log("Received event '" + event + "' (id: " + identifier + ").");
+
     // Delay call because jumping to Phantom from an handler breaks emit ...
     setTimeout(function() {
       window.callPhantom({
@@ -47,6 +49,7 @@ define(function(require) {
     // Register known events from server.
     registerEvent("exit");
     registerIdentifiedEvent("connected");
+    //registerIdentifiedEvent("fetch");
   };
 
   return {

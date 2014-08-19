@@ -162,8 +162,13 @@ Phantom.prototype._handlePhantomExit = function(code) {
 };
 
 
-Phantom.prototype.fetch = function(url) {
-  //
+// TODO: document
+Phantom.prototype.fetch = function(url, page) {
+  this._emit("fetch", url).then(function(page_info) {
+    page.phantom_id = page_info.id;
+    page.title      = page_info.title;
+    return page;
+  });
 };
 
 /**
