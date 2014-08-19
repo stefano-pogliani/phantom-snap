@@ -42,17 +42,13 @@ PageFetcher.prototype._getPhantom = function() {
 
 /**
  * Fetches a page.
- * @param {!Page} page A page instance wrapping the URI to fetch.
+ * @param {!String} uri The URI of the page to fetch.
  * @returns {!Object} A Q promise that resolves to the page when ready.
  */
-PageFetcher.prototype.fetch = function(page) {
+PageFetcher.prototype.fetch = function(uri) {
   var _this = this;
   return this._getPhantom().then(function(phantom) {
-    return phantom.fetch(_this._base + page.uri, _this._waiter_path);
-  }).then(function(page_info) {
-    page.phantom_id = page_info.id;
-    page.title      = page_info.title;
-    return page;
+    return phantom.fetch(_this._base, uri, _this._waiter_path);
   });
 };
 

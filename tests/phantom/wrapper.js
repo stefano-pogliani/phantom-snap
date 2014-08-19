@@ -14,7 +14,7 @@ suite("PhantomJS Wrapper", function() {
     var result  = undefined;
 
     phantom.spawn().then(function() {
-      return phantom.fetch("non-existent-url");
+      return phantom.fetch("non-existent-url", "");
 
     }).then(function() {
       // Verify Phantom fails.
@@ -41,12 +41,13 @@ suite("PhantomJS Wrapper", function() {
     var result  = undefined;
 
     phantom.spawn().then(function() {
-      return phantom.fetch("https://www.google.com", "./waiters/noop");
+      return phantom.fetch("https://www.google.com", "", "./waiters/noop");
 
-    }).then(function(info) {
+    }).then(function(page) {
       // Verify results.
-      assert.equal("Google", info.title);
-      assert(typeof info.id === "number");
+      assert.equal("Google", page.title);
+      assert(typeof page.phantom_id === "number");
+      assert(page.phantom !== null);
 
     }).fail(function(ex) {
       // Intercept assert failures.

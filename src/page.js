@@ -8,6 +8,13 @@
 var Page = module.exports = function(uri, depth) {
 
   /**
+   * Reference to the Phantom wrapper to comunicate with the instance that
+   * loaded this page.
+   * @type {Phantom}
+   */
+  this.phantom = null;
+
+  /**
    * Id of the page in the Phantom fetching process.
    * @type {Number}
    */

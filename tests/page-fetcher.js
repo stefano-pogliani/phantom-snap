@@ -1,5 +1,4 @@
 var assert      = require("assert");
-var Page        = require("../out/page");
 var PageFetcher = require("../out/page-fetcher");
 
 
@@ -48,12 +47,11 @@ suite("PageFetcher", function() {
 
   test("Fetch Google", function(done) {
     var fetcher = this.fetcher;
-    var page    = new Page("");
     var result  = undefined;
 
-    fetcher.fetch(page).then(function(page_again) {
-      assert(page === page_again);
-      assert("Google", page.phantom_id);
+    fetcher.fetch("").then(function(page) {
+      assert.equal("", page.uri);
+      assert.equal("Google", page.title);
 
     }).fail(function(ex) {
       // Intercept assert fails.

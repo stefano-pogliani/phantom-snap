@@ -7,6 +7,8 @@ var socketio      = require("socket.io");
 var PhantomJS = require("phantomjs");
 var Q         = require("q");
 
+var Page = require("../page");
+
 
 /**
  * Wrapper to send commands from Node to Phantom and get results back.
@@ -40,6 +42,7 @@ var Phantom = module.exports = function(options) {
   this._io      = socketio.listen(this._server);
 
   this._clear   = null;
+  this._pages   = [];
   this._process = null;
   this._ready   = null;
   this._socket  = null;
@@ -63,8 +66,11 @@ Phantom.prototype._afterPhantomExits = function() {
   this._server.close(function() {
     clear.resolve();
   });
+  
+  // TODO: Iterate over pages in this._pages and clear phantom information.
 
   this._clear   = null;
+  this._pages   = [];
   this._process = null;
   this._ready   = null;
 };
@@ -172,15 +178,24 @@ Phantom.prototype._handlePhantomExit = function(code) {
 /**
  * Requests to Phantom to fetch a new page.
  * 
- * @param {!String} url         The url to fetch.
+ * @param {!String} host        The host where the resource is located.
+ * @param {!String} uri         The identifier of the resource on the host.
  * @param {!String} waiter_path The path to the Phantom module that defines the
  *                              LoadWaiter to use with this page.
- * @returns {!Q.Promise} A promise that resolves when the page is loaded.
+ * @returns {!Q.Promise} A promise that resolves to the loaded page.
  */
-Phantom.prototype.fetch = function(url, waiter_path) {
+Phantom.prototype.fetch = function(host, uri, waiter_path) {
+  var _this = this;
   return this._emit("fetch", {
-    url:         url,
+    url:         host + uri,
     waiter_path: waiter_path
+  }).then(function(page_info) {
+    var page = new Page(uri);
+    page.phantom    = _this;
+    page.phantom_id = page_info.id;
+    page.title      = page_info.title;
+    _this._pages.push(page);
+    return page;
   });
 };
 
