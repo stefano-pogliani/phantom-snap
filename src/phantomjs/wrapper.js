@@ -46,7 +46,7 @@ var Phantom = module.exports = function(options) {
 
   // Build Phantom arguments list.
   this._args = [
-    PhantomJS.path, path.join(__dirname, "driver.js"), this.port
+    PhantomJS.path, path.join(__dirname, "driver.js"), this.port, "--debug"
   ];
 
   // Setup express and socket.io.
@@ -90,6 +90,7 @@ Phantom.prototype._emit = function(event, data) {
   var identifier = this._request_id++;
   this._requests[identifier] = deferred;
   this._socket.emit(event, identifier, data);
+  this._logger.debug("Emitted event '%s' (id: %d).", event, identifier);
   return deferred.promise;
 };
 
@@ -103,13 +104,18 @@ Phantom.prototype._emit = function(event, data) {
 Phantom.prototype._register = function(socket, event) {
   var _this = this;
   socket.on(event, function(id, data) {
+    _this._logger.debug("Received event '%s'.", event);
     if (_this._requests[id]) {
       if (data && typeof data === "object" && data.__phantom_error) {
         _this._requests[id].reject(data.data, event);
+        _this._logger.debug("Rejected event id: %d.", id);
       } else {
         _this._requests[id].resolve(data, event);
+        _this._logger.debug("Resolved event id: %d.", id);
       }
       delete _this._requests[id];
+    } else {
+      this._logger.info("Ignored event '%s' with unknown id %).", event, id);
     }
   });
 };
@@ -126,7 +132,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
 
   // Register events.
   this._register(socket, "ready");
-  this._register(socket, "error");
+  this._register(socket, "report-error");
 
   // Emit "connected" to trigger Phantom setup.
   this._emit("connected").then(function() {
@@ -162,9 +168,15 @@ Phantom.prototype._handlePhantomExit = function(code) {
 };
 
 
-// TODO: document
+/**
+ * Requests to Phantom to fetch a new page.
+ * 
+ * @param {!String} url  The url to fetch.
+ * @param {!Object} page The page object.
+ * @returns {!Q.Promise} A promise that resolves when the page is loaded.
+ */
 Phantom.prototype.fetch = function(url, page) {
-  this._emit("fetch", url).then(function(page_info) {
+  return this._emit("fetch", url).then(function(page_info) {
     page.phantom_id = page_info.id;
     page.title      = page_info.title;
     return page;

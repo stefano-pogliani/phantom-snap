@@ -9,6 +9,33 @@ suite("PhantomJS Wrapper", function() {
     });
   });
 
+  test("failing fetch", function(done) {
+    var phantom = this.phantom;
+    var result  = undefined;
+
+    phantom.spawn().then(function() {
+      return phantom.fetch("non-existent-url");
+
+    }).then(function() {
+      // Verify Phantom fails.
+      result = new Error("Page fetch did not fail.");
+
+    }).fail(function(status) {
+      // Verify expected result.
+      assert.equal("fail", status);
+
+    }).fail(function(ex) {
+      // Intercept assert failures.
+      result = ex;
+
+    }).finally(function() {
+      // Stop Phantom test and resolve test.
+      phantom.stop().then(function() {
+        done(result);
+      });
+    });
+  });
+
   test("spawn", function(done) {
     var phantom = this.phantom;
     phantom.spawn().then(function() {

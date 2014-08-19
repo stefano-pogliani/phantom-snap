@@ -49,7 +49,7 @@ define(function(require) {
     // Register known events from server.
     registerEvent("exit");
     registerIdentifiedEvent("connected");
-    //registerIdentifiedEvent("fetch");
+    registerIdentifiedEvent("fetch");
   };
 
   return {

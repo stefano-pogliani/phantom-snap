@@ -1,7 +1,14 @@
 var webpage = require("webpage");
 
 
-// TODO: document
+/**
+ * Phantom side controller that comunicates with Node.
+ * @class Controller
+ * 
+ * @param {!Number}  port  The port the server is listening on.
+ * @param {!Boolean} debug Enable debug mode, which prints status messages to
+ *                         stdout.
+ */
 var Controller = module.exports = function(port, debug) {
   var _this = this;
   this._control_page = this.createPage();
@@ -45,7 +52,10 @@ Controller.prototype._handleFromPage = function(event_data) {
   }
 };
 
-// TODO: document.
+/**
+ * Outputs the message if debug mode is enabled.
+ * @param {!String} msg The message to output.
+ */
 Controller.prototype._log = function(msg) {
   if (this._debug) {
     console.log(msg);
@@ -93,7 +103,7 @@ Controller.prototype.emit = function(event, id, data) {
  * @param {!Object} data The data to send along the message.
  */
 Controller.prototype.emitFail = function(id, data) {
-  this.emit("error", id, {
+  this.emit("report-error", id, {
     __phantom_error: true,
     data:            data
   });
@@ -111,17 +121,35 @@ Controller.prototype.evaluate = function(var_args) {
 /*** Events Handlers ***/
 Controller.prototype._events = {};
 
-// TODO: document.
+/** The control server is ready to deal with me. */
 Controller.prototype._events.connected = function(data, event_id) {
   this.emit("ready", event_id);
 };
 
-// TODO: document.
+/** The control server requestes me to exit. */
 Controller.prototype._events.exit = function() {
   phantom.exit();
 };
 
-// TODO: document.
-//Controller.prototype._events.fetch = function() {
-//  phantom.exit();
-//};
+/**
+ * The control server wants me to load a new page.
+ * 
+ * @param {String} url      The url of the page to fetch.
+ * @param {Number} event_id The unique id of the request event.
+ */
+Controller.prototype._events.fetch = function(url, event_id) {
+  var controller = this;
+  var page       = this.createPage();
+  page.open(url, function(status) {
+    if (status !== "success") {
+      controller.emitFail(event_id, status);
+      return;
+    }
+
+    // Get a unique id for the page.
+    // Wait for page to (really) load - this is where the waiter kiks in.
+    // Extract title.
+    // Send id and title to Node.
+
+  });
+};
