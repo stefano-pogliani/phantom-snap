@@ -48,6 +48,10 @@ PageFetcher.prototype.fetch = function(page) {
   var _this = this;
   return this._getPhantom().then(function(phantom) {
     return phantom.fetch(_this.base + page.uri, page);
+  }).then(function(page_info) {
+    page.phantom_id = page_info.id;
+    page.title      = page_info.title;
+    return page;
   });
 };
 

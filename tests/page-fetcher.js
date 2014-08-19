@@ -6,7 +6,8 @@ var PageFetcher = require("../out/page-fetcher");
 suite("PageFetcher", function() {
   setup(function() {
     this.fetcher = new PageFetcher({
-      logger: require("../out/silent-logger")
+      base_url: "https://www.google.com",
+      logger:   require("../out/silent-logger")
     });
   });
 
@@ -42,6 +43,27 @@ suite("PageFetcher", function() {
       } else {
         done(new Error("No Phantom to stop."));
       }
+    });
+  });
+
+  test("Fetch Google", function(done) {
+    var fetcher = this.fetcher;
+    var page    = new Page("");
+    var result  = undefined;
+
+    fetcher.fetch(page).then(function(page_again) {
+      assert(page === page_again);
+      assert("Google", page.phantom_id);
+
+    }).fail(function(ex) {
+      // Intercept assert fails.
+      result = ex;
+
+    }).finally(function() {
+      // Stop Phantom and complete test.
+      fetcher.stop().then(function() {
+        done(result);
+      });
     });
   });
 

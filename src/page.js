@@ -6,6 +6,19 @@
  * @param {=Number} depth The dinsance of this page from the main page. 
  */
 var Page = module.exports = function(uri, depth) {
+
+  /**
+   * Id of the page in the Phantom fetching process.
+   * @type {Number}
+   */
+  this.phantom_id = null;
+
+  /**
+   * Title of the page.
+   * @type {String}
+   */
+  this.title = null;
+
   /**
    * The URI of the page.
    * @type {!String}

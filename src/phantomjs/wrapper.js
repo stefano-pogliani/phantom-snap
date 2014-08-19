@@ -131,6 +131,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
   this._socket = socket;
 
   // Register events.
+  this._register(socket, "fetched");
   this._register(socket, "ready");
   this._register(socket, "report-error");
 
@@ -175,12 +176,8 @@ Phantom.prototype._handlePhantomExit = function(code) {
  * @param {!Object} page The page object.
  * @returns {!Q.Promise} A promise that resolves when the page is loaded.
  */
-Phantom.prototype.fetch = function(url, page) {
-  return this._emit("fetch", url).then(function(page_info) {
-    page.phantom_id = page_info.id;
-    page.title      = page_info.title;
-    return page;
-  });
+Phantom.prototype.fetch = function(url) {
+  return this._emit("fetch", url);
 };
 
 /**

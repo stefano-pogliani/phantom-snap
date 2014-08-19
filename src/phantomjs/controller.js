@@ -10,10 +10,13 @@ var webpage = require("webpage");
  *                         stdout.
  */
 var Controller = module.exports = function(port, debug) {
-  var _this = this;
+  var _this          = this;
   this._control_page = this.createPage();
   this._debug        = debug;
   this._port         = port;
+
+  this._page_id = 0;
+  this._pages   = {};
 
   this._control_page.onCallback = function() {
     _this._handleFromPage.apply(_this, arguments);
@@ -140,16 +143,23 @@ Controller.prototype._events.exit = function() {
 Controller.prototype._events.fetch = function(url, event_id) {
   var controller = this;
   var page       = this.createPage();
+  var waiter     = { wait: function(page, cb) { cb(); } };
+
   page.open(url, function(status) {
     if (status !== "success") {
       controller.emitFail(event_id, status);
       return;
     }
 
-    // Get a unique id for the page.
-    // Wait for page to (really) load - this is where the waiter kiks in.
-    // Extract title.
-    // Send id and title to Node.
+    var page_id = controller._page_id++;
+    controller._pages[page_id] = page;
 
+    // Wait for page to (really) load.
+    waiter.wait(page, function() {
+      controller.emit("fetched", event_id, {
+        id:    page_id,
+        title: page.title
+      });
+    });
   });
 };
