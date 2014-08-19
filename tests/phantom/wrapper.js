@@ -41,7 +41,7 @@ suite("PhantomJS Wrapper", function() {
     var result  = undefined;
 
     phantom.spawn().then(function() {
-      return phantom.fetch("https://www.google.com");
+      return phantom.fetch("https://www.google.com", "./waiters/noop");
 
     }).then(function(info) {
       // Verify results.

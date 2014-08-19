@@ -16,8 +16,9 @@ var Phantom = require("./phantomjs/wrapper");
  *     * phantom_port: The port for the Phantom server to listent to.
  */
 var PageFetcher = module.exports = function(options) {
-  this.base     = options.base_url || "http://localhost:8080/";
-  this._phantom = new Phantom({
+  this._base        = options.base_url    || "http://localhost:8080/";
+  this._waiter_path = options.waiter_path || "./waiters/noop";
+  this._phantom     = new Phantom({
     logger: options.logger,
     port:   options.phantom_port
   });
@@ -47,7 +48,7 @@ PageFetcher.prototype._getPhantom = function() {
 PageFetcher.prototype.fetch = function(page) {
   var _this = this;
   return this._getPhantom().then(function(phantom) {
-    return phantom.fetch(_this.base + page.uri, page);
+    return phantom.fetch(_this._base + page.uri, _this._waiter_path);
   }).then(function(page_info) {
     page.phantom_id = page_info.id;
     page.title      = page_info.title;

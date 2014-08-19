@@ -45,8 +45,10 @@ Controller.prototype._handleFromPage = function(event_data) {
       this._log("Handled event '" + event + "' (id: " + id + ").");
     } catch(err) {
       this._log("Error handling event '" + event + "' (id: " + id + ").");
+      this._log(err.stack);
       this.emitFail(id, {
         message: err.message,
+        trace:   err.stack,
         type:    "exception"
       });
     }
@@ -140,18 +142,18 @@ Controller.prototype._events.exit = function() {
  * @param {String} url      The url of the page to fetch.
  * @param {Number} event_id The unique id of the request event.
  */
-Controller.prototype._events.fetch = function(url, event_id) {
+Controller.prototype._events.fetch = function(data, event_id) {
   var controller = this;
   var page       = this.createPage();
-  var waiter     = { wait: function(page, cb) { cb(); } };
 
-  page.open(url, function(status) {
+  page.open(data.url, function(status) {
     if (status !== "success") {
       controller.emitFail(event_id, status);
       return;
     }
 
     var page_id = controller._page_id++;
+    var waiter  = require(data.waiter_path);
     controller._pages[page_id] = page;
 
     // Wait for page to (really) load.

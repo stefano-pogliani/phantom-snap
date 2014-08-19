@@ -172,12 +172,16 @@ Phantom.prototype._handlePhantomExit = function(code) {
 /**
  * Requests to Phantom to fetch a new page.
  * 
- * @param {!String} url  The url to fetch.
- * @param {!Object} page The page object.
+ * @param {!String} url         The url to fetch.
+ * @param {!String} waiter_path The path to the Phantom module that defines the
+ *                              LoadWaiter to use with this page.
  * @returns {!Q.Promise} A promise that resolves when the page is loaded.
  */
-Phantom.prototype.fetch = function(url) {
-  return this._emit("fetch", url);
+Phantom.prototype.fetch = function(url, waiter_path) {
+  return this._emit("fetch", {
+    url:         url,
+    waiter_path: waiter_path
+  });
 };
 
 /**

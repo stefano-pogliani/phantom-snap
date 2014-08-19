@@ -57,11 +57,15 @@ suite("PageFetcher", function() {
 
     }).fail(function(ex) {
       // Intercept assert fails.
-      result = ex;
+      if (ex instanceof Error) {
+        result = ex;
+      } else {
+        result = new Error(JSON.stringify(ex));
+      }
 
     }).finally(function() {
       // Stop Phantom and complete test.
-      fetcher.stop().then(function() {
+      return fetcher.stop().then(function() {
         done(result);
       });
     });
