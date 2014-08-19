@@ -2,6 +2,8 @@ var child_process = require("child_process");
 var path          = require("path");
 var Q             = require("q");
 
+var Phantom = require("./phantomjs/wrapper");
+
 
 /**
  * @class PageFetcher
@@ -14,32 +16,25 @@ var Q             = require("q");
  *     * phantom_port: The port for the Phantom server to listent to.
  */
 var PageFetcher = module.exports = function(options) {
-  this._phantom = null;
   this.base     = options.base_url || "http://localhost:8080/";
-  this.port     = options.port     || 8081;
+  this._phantom = new Phantom({
+    logger: options.logger,
+    port:   options.phantom_port
+  });
 };
 
 
 /**
- * Creates a new instance of PhantomJS.
- * @returns {!Q.Promise} A promise that resolves to the Phantom instance.
- */
-PageFetcher.prototype._createPhantom = function() {
-  var deferred = Q.defer();
-  return deferred.promise;
-};
-
-/**
- * Gets an available Phantom instance.
+ * Gets an available Phantom instance, starting it if needed.
  * @returns {!Q.Promise} A promise that resolves to the Phantom instance.
  */
 PageFetcher.prototype._getPhantom = function() {
-  if (this._phantom) {
+  if (this._phantom.isRunning()) {
     var deferred = Q.defer();
     deferred.resolve(this._phantom);
     return deferred.promise;
   } else {
-    return this._createPhantom();
+    return this._phantom.spawn();
   }
 };
 
@@ -50,12 +45,18 @@ PageFetcher.prototype._getPhantom = function() {
  * @returns {!Object} A Q promise that resolves to the page when ready.
  */
 PageFetcher.prototype.fetch = function(page) {
+  var _this = this;
   return this._getPhantom().then(function(phantom) {
-    phantom.createPage(function() {
-      console.log(arguments);
-    });
-  }).then(function(page) {
-    //change user agent: "PhantomSnap"
-    console.log(page);
+    return phantom.fetch(_this.base + page.uri);
+  }).then(function(page_id) {
+    console.log(page_id);
   });
+};
+
+/**
+ * Stops the Phantom instance attached to this fetcher.
+ * @returns {!Q.Promise} A promise that resolves when Phantom has stopped.
+ */
+PageFetcher.prototype.stop = function() {
+  return this._phantom.stop();
 };

@@ -18,4 +18,13 @@ suite("PhantomJS Wrapper", function() {
     });
   });
 
+  test("stop without running", function(done) {
+    var phantom = this.phantom;
+    phantom.stop().then(function() {
+      done();
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
+
 });

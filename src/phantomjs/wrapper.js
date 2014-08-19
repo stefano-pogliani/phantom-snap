@@ -21,6 +21,19 @@ var Phantom = module.exports = function(options) {
   options   = options || {};
   this.port = options.port || 8081;
 
+  /**
+   * The next free unique identifier for requests sent to Phantom.
+   * @type {!Number}
+   */
+  this._request_id = 0;
+
+  /**
+   * A map from request id to promise.
+   * Only pending requests are kept in this map.
+   * @type {!Object}
+   */
+  this._requests = {};
+
   this._app     = express();
   this._logger  = options.logger || require("../default-logger");
   this._server  = http.createServer(this._app);
@@ -57,30 +70,68 @@ Phantom.prototype._afterPhantomExits = function() {
 };
 
 /** Attaches the current instance to the process running Phantom. */
-Phantom.prototype._attachToProcess = function(process) {
-  this._process = process;
-  process.on("exit", this._handlePhantomExit.bind(this));
-  process.stderr.on("data", this._handleStdErrData.bind(this));
-  process.stdout.on("data", this._handleStdOutData.bind(this));
+Phantom.prototype._attachToProcess = function(proc) {
+  this._process = proc;
+  proc.on("exit", this._handlePhantomExit.bind(this));
+  proc.stderr.on("data", this._handleStdErrData.bind(this));
+  proc.stdout.on("data", this._handleStdOutData.bind(this));
+};
+
+/**
+ * Sends an event to Phantom and waits for a response.
+ * 
+ * @param {!String} event The event to emit.
+ * @param {=Object} data  A data object to send with the event.
+ * @returns {!Q.Promise} A promise that resolves when a reply to the event
+ *                       is received.
+ */
+Phantom.prototype._emit = function(event, data) {
+  var deferred   = Q.defer();
+  var identifier = this._request_id++;
+  this._requests[identifier] = deferred;
+  this._socket.emit(event, identifier, data);
+  return deferred.promise;
+};
+
+/**
+ * Registers an identified event on the socket and resolves the promise
+ * associated to the identifier.
+ * 
+ * @param {!Object} socket The socket to attach the listener to.
+ * @param {!String} event  The event to listen for.
+ */
+Phantom.prototype._register = function(socket, event) {
+  var _this = this;
+  socket.on(event, function(id, data) {
+    if (_this._requests[id]) {
+      if (data && typeof data === "object" && data.__phantom_error) {
+        _this._requests[id].reject(data.data, event);
+      } else {
+        _this._requests[id].resolve(data, event);
+      }
+      delete _this._requests[id];
+    }
+  });
 };
 
 
 /*** HANDLERS ***/
-/** Invoked when Phantom is ready. */
-Phantom.prototype._handleReady = function() {
-  this._ready = this._ready || Q.defer();
-  this._ready.resolve();
-};
-
 /**
  * Handles the connection of a client.
  * @param {!Object} socket The socket used to talk to the client.
  */
 Phantom.prototype._handleSocketConnect = function(socket) {
+  var _this    = this;
   this._socket = socket;
-  socket.on("ready", this._handleReady.bind(this));
 
-  socket.emit("connected");
+  // Register events.
+  this._register(socket, "ready");
+  this._register(socket, "error");
+
+  // Emit "connected" to trigger Phantom setup.
+  this._emit("connected").then(function() {
+    _this._ready.resolve(_this);
+  });
 };
 
 /**
@@ -111,6 +162,17 @@ Phantom.prototype._handlePhantomExit = function(code) {
 };
 
 
+Phantom.prototype.fetch = function(url) {
+  //
+};
+
+/**
+ * @returns {!Boolean} True if Phantom is ready and running.
+ */
+Phantom.prototype.isRunning = function() {
+  return !!(this._process || this._clear);
+};
+
 /**
  * Starts the control server and spawns the Phantom process.
  * @returns {!Q.Promise} A promise that resolves when Phantom is ready.
@@ -138,9 +200,21 @@ Phantom.prototype.spawn = function() {
  *                       is terminated.
  */
 Phantom.prototype.stop = function() {
-  this._clear = Q.defer();
+  var clear = this._clear = Q.defer();
+
   if (this._socket) {
     this._socket.emit("exit");
+
+  } else {
+    // Assume server is running and try to stop.
+    // If it was not ignore the error.
+    try {
+      this._server.close(function() {
+        clear.resolve();
+      });
+    } catch(ex) {
+      clear.resolve();
+    }
   }
   return this._clear.promise;
 };

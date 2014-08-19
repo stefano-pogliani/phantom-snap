@@ -8,11 +8,12 @@ define(function(require) {
    * @param {!String} event The event to handle.
    * @param {=Object} data  Optional data sent with the event.
    */
-  var handleInEvent = function(event, data) {
+  var handleInEvent = function(event, identifier, data) {
     // Delay call because jumping to Phantom from an handler breaks emit ...
     setTimeout(function() {
       window.callPhantom({
         data:  data,
+        id:    identifier,
         event: event
       });
     }, 10);
@@ -24,7 +25,17 @@ define(function(require) {
    */
   var registerEvent = function(event) {
     socket.on(event, function(data) {
-      handleInEvent(event, data);
+      handleInEvent(event, null, data);
+    });
+  };
+
+  /**
+   * Registers an event for forwarding to Phantom.
+   * @param {!String} event The event to forward.
+   */
+  var registerIdentifiedEvent = function(event) {
+    socket.on(event, function(identifier, data) {
+      handleInEvent(event, identifier, data);
     });
   };
 
@@ -34,8 +45,8 @@ define(function(require) {
     window.socket = socket;
 
     // Register known events from server.
-    registerEvent("connected");
     registerEvent("exit");
+    registerIdentifiedEvent("connected");
   };
 
   return {

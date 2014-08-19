@@ -24,6 +24,20 @@ var CONTROL_EVENTS = {
   exit:      require("./handlers/exit")
 };
 
+/**
+ * Sends an error message to the controller.
+ * @param {!Number} id   The identifier of the message being handled when the
+ *                       failure occurs.
+ * @param {!Object} data The data to send along the message.
+ */
+var emitFail = function(id, data) {
+  control_page.evaluate(function() {
+    socket.emit("error", id, {
+      __phantom_error: true,
+      data:            data
+    });
+  });
+};
 
 /**
  * Invoked when control_page receives an event from the server.
@@ -31,8 +45,17 @@ var CONTROL_EVENTS = {
  */
 control_page.onCallback = function(event) {
   var handler = CONTROL_EVENTS[event.event];
-  handler = handler || function() {};
-  handler(control_page, event.data);
+  if (handler) {
+    try {
+      handler(control_page, event.data, event.id);
+    } catch(ex) {
+      emitFail(event.id, {
+        message: ex.message
+      });
+    }
+  } else {
+    emitFail(event.id, "");
+  }
 };
 
 // Finally get the control page.
@@ -42,3 +65,7 @@ control_page.open("http://127.0.0.1:" + port + "/", function(status) {
     phantom.exit(1);
   }
 });
+
+control_page.onAlert = function(msg) {
+  console.log(msg);
+};
