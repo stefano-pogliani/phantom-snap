@@ -121,7 +121,7 @@ Phantom.prototype._register = function(socket, event) {
       }
       delete _this._requests[id];
     } else {
-      this._logger.info("Ignored event '%s' with unknown id %).", event, id);
+      this._logger.info("Ignored event '%s' with unknown id %d).", event, id);
     }
   });
 };
@@ -136,8 +136,9 @@ Phantom.prototype._handleSocketConnect = function(socket) {
   var _this    = this;
   this._socket = socket;
 
-  // Register events.
+  // Register events so that their promises can be resolved.
   this._register(socket, "fetched");
+  this._register(socket, "gotContent");
   this._register(socket, "ready");
   this._register(socket, "report-error");
 
@@ -190,13 +191,17 @@ Phantom.prototype.fetch = function(host, uri, waiter_path) {
     url:         host + uri,
     waiter_path: waiter_path
   }).then(function(page_info) {
-    var page = new Page(uri);
-    page.phantom    = _this;
-    page.phantom_id = page_info.id;
-    page.title      = page_info.title;
+    var page = new Page(_this, uri);
+    page._phantom_id = page_info.id;
+    page.title       = page_info.title;
     _this._pages.push(page);
     return page;
   });
+};
+
+
+Phantom.prototype.getContentFor = function(page_id) {
+  return this._emit("getContent", page_id);
 };
 
 /**

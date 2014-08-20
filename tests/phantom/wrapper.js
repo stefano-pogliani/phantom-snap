@@ -46,7 +46,7 @@ suite("PhantomJS Wrapper", function() {
     }).then(function(page) {
       // Verify results.
       assert.equal("Google", page.title);
-      assert(typeof page.phantom_id === "number");
+      assert(typeof page._phantom_id === "number");
       assert(page.phantom !== null);
 
     }).fail(function(ex) {

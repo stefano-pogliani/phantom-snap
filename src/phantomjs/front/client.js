@@ -50,6 +50,7 @@ define(function(require) {
     registerEvent("exit");
     registerIdentifiedEvent("connected");
     registerIdentifiedEvent("fetch");
+    registerIdentifiedEvent("getContent");
   };
 
   return {

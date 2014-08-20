@@ -165,3 +165,18 @@ Controller.prototype._events.fetch = function(data, event_id) {
     });
   });
 };
+
+/**
+ * Gets the HTML content for a page.
+ * @param {!Number} page_id  The id of the page to get content for.
+ * @param {!Number} event_id The id of the requesting event.
+ */
+Controller.prototype._events.getContent = function(page_id, event_id) {
+  var page = this._pages[page_id];
+  if (!page) {
+    this.emitFail(
+        event_id, "Invalid page identifier '" + page_id + "' for getContent.");
+    return;
+  }
+  this.emit("gotContent", event_id, page.content);
+};
