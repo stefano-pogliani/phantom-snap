@@ -76,6 +76,20 @@ suite("Advanced page tests", function() {
     });
   });
 
+  test("Close", function(done) {
+    this.fetcher.fetch("get-html.html").then(function(page) {
+      return page.close().then(function() {
+        return page;
+      });
+    }).then(function(page) {
+      assert.equal(page._phantom, null);
+      assert.equal(page._phantom_id, null);
+      done();
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
+
   test("Get HTML", function(done) {
     this.fetcher.fetch("get-html.html").then(function(page) {
       return page.getContent();

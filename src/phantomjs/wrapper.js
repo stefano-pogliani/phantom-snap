@@ -140,6 +140,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
   this._socket = socket;
 
   // Register events so that their promises can be resolved.
+  this._register(socket, "closed");
   this._register(socket, "fetched");
   this._register(socket, "gotContent");
   this._register(socket, "ready");
@@ -202,7 +203,24 @@ Phantom.prototype.fetch = function(host, uri, waiter_path) {
   });
 };
 
+/**
+ * Closes a page.
+ * @param {!Number} page_id The identifier of the page to close.
+ * @returns {Q.Promise} A promise that resolves when the page is closed.
+ */
+Phantom.prototype.close = function(page_id) {
+  var _this = this;
+  return this._emit("close", page_id).then(function() {
+    var page_index = _this._pages.indexOf(page_id);
+    _this._pages.splice(page_index, 1);
+  });
+};
 
+/**
+ * Gets the content for a page.
+ * @param {!Number} page_id The identifier of the page to get content for.
+ * @returns {Q.Promise} A promise that resolves with the content.
+ */
 Phantom.prototype.getContentFor = function(page_id) {
   return this._emit("getContent", page_id);
 };

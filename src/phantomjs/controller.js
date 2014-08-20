@@ -126,6 +126,23 @@ Controller.prototype.evaluate = function(var_args) {
 /*** Events Handlers ***/
 Controller.prototype._events = {};
 
+/**
+ * Closes a page.
+ * @param {!Number} page_id  The identifier of the page to close.
+ * @param {!Number} event_id The identifier of the event requesting the close.
+ */
+Controller.prototype._events.close = function(page_id, event_id) {
+  var page = this._pages[page_id];
+  if (!page) {
+    this.emitFail(
+        event_id, "Invalid page identifier '" + page_id + "' for close.");
+    return;
+  }
+  page.close();
+  delete this._pages[page_id];
+  this.emit("closed", event_id);
+};
+
 /** The control server is ready to deal with me. */
 Controller.prototype._events.connected = function(data, event_id) {
   this.emit("ready", event_id);

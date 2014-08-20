@@ -64,6 +64,25 @@ Page.prototype._verifyPhantom = function() {
 };
 
 /**
+ * Closes the page on Phantom and cleans up references.
+ * @returns {Q.Promise} A promise that resolves when the page is closed.
+ */
+Page.prototype.close = function() {
+  var page = this;
+  return this._verifyPhantom().then(function() {
+    return page._phantom.close(page._phantom_id);
+  }).then(function() {
+    page.detachPhantom();
+  });
+};
+
+/** Removes the references to Phantom from the page. */
+Page.prototype.detachPhantom = function() {
+  this._phantom    = null;
+  this._phantom_id = null;
+};
+
+/**
  * Gets the HTML for the page.
  * @returns {Q.Promise} A promise that resolves when the HTML is available.
  */
@@ -72,10 +91,4 @@ Page.prototype.getContent = function() {
   return this._verifyPhantom().then(function() {
     return page._phantom.getContentFor(page._phantom_id);
   });
-};
-
-/** Removes the references to Phantom from the page. */
-Page.prototype.detachPhantom = function() {
-  this._phantom    = null;
-  this._phantom_id = null;
 };
