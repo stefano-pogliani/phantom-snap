@@ -73,3 +73,9 @@ Page.prototype.getContent = function() {
     return page._phantom.getContentFor(page._phantom_id);
   });
 };
+
+/** Removes the references to Phantom from the page. */
+Page.prototype.detachPhantom = function() {
+  this._phantom    = null;
+  this._phantom_id = null;
+};

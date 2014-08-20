@@ -68,6 +68,9 @@ Phantom.prototype._afterPhantomExits = function() {
   });
   
   // TODO: Iterate over pages in this._pages and clear phantom information.
+  for (var idx = 0; idx < this._pages.length; idx++) {
+    this._pages[idx].detachPhantom();
+  }
 
   this._clear   = null;
   this._pages   = [];

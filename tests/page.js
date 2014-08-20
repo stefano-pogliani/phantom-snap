@@ -13,6 +13,42 @@ suite("Page", function() {
     assert.equal("a", page.uri);
     assert.equal(2,   page.depth);
   });
+
+  test("Phantom detach", function(done) {
+    // Prepare.
+    var logger   = require("../out/silent-logger");
+    var fetcher = new PageFetcher({
+      base_url: "http://localhost:9000/",
+      logger:   logger
+    });
+    var server = new StaticServer({
+      logger: logger,
+      path:   path.join(__dirname, "fixtures"),
+      port:   9000
+    });
+    server.start();
+
+    // Act.
+    fetcher.fetch("get-html.html").then(function(page) {
+      return fetcher.stop().then(function() {
+        return server.stop();
+      }).then(function() {
+        return page;
+      });
+
+    }).then(function(page) {
+      // Verify.
+      assert.equal(page._phantom, null);
+      assert.equal(page._phantom_id, null);
+      return page._verifyPhantom().fail(function() {
+        done();
+      });
+
+    }).fail(function(ex) {
+      // Ensure no exception escapes.
+      done(ex);
+    });
+  });
 });
 
 suite("Advanced page tests", function() {
