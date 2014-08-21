@@ -200,6 +200,35 @@ Controller.prototype._events.getContent = function(page_id, event_id) {
 };
 
 /**
+ * Lists all the links in a page.
+ * @param {!Number} page_id  The id of the page to list links for.
+ * @param {!Number} event_id The id of the requesting event.
+ */
+Controller.prototype._events.listLinks = function(page_id, event_id) {
+  var page  = this._pages[page_id];
+  if (!page) {
+    this.emitFail(
+        event_id, "Invalid page identifier '" + page_id + "' for listLinks.");
+    return;
+  }
+
+  var links = page.evaluate(function() {
+    var links = [];
+    var tags  = document.getElementsByTagName("a");
+
+    for (var idx = 0; idx < tags.length; idx++) {
+      links.push({
+        href:  tags[idx].href,
+        title: tags[idx].text
+      });
+    }
+    return links;
+  });
+
+  this.emit("links", event_id, links);
+};
+
+/**
  * Renders a page into a file.
  * @param {!Object} data     The parameters for the render request.
  * @param {!Number} event_id The id of the requesting event.
@@ -211,7 +240,7 @@ Controller.prototype._events.render = function(data, event_id) {
 
   if (!page) {
     this.emitFail(
-        event_id, "Invalid page identifier '" + page_id + "' for getContent.");
+        event_id, "Invalid page identifier '" + page_id + "' for render.");
     return;
   }
 

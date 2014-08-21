@@ -103,6 +103,27 @@ suite("Advanced page tests", function() {
     });
   });
 
+  test("List links", function(done) {
+    this.fetcher.fetch("links.html").then(function(page) {
+      return page.listLinks();
+    }).then(function(links) {
+      assert.equal(2, links.length);
+      assert(typeof links[0] === "object");
+      assert(typeof links[1] === "object");
+
+      // Check data
+      assert.equal("Internal", links[0].title);
+      assert.equal("Google",   links[1].title);
+      assert.equal("http://localhost:9000/internal", links[0].href);
+      assert.equal("https://www.google.com/",        links[1].href);
+
+      done();
+
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
+
   test("Render", function(done) {
     this.fetcher.fetch("get-html.html").then(function(page) {
       return page.render("./tests/render-result.png");

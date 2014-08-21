@@ -143,6 +143,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
   this._register(socket, "closed");
   this._register(socket, "fetched");
   this._register(socket, "gotContent");
+  this._register(socket, "links");
   this._register(socket, "ready");
   this._register(socket, "rendered");
   this._register(socket, "report-error");
@@ -231,6 +232,15 @@ Phantom.prototype.getContentFor = function(page_id) {
  */
 Phantom.prototype.isRunning = function() {
   return !!(this._process || this._clear);
+};
+
+/**
+ * Lists all the links in a page.
+ * @param {!Number} page_id The identifier of the page to list links for.
+ * @returns {Q.Promise} A promise that resolves to a list of links.
+ */
+Phantom.prototype.listLinksFor = function(page_id) {
+  return this._emit("listLinks", page_id);
 };
 
 /**

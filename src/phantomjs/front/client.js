@@ -52,6 +52,7 @@ define(function(require) {
     registerIdentifiedEvent("connected");
     registerIdentifiedEvent("fetch");
     registerIdentifiedEvent("getContent");
+    registerIdentifiedEvent("listLinks");
     registerIdentifiedEvent("render");
   };
 

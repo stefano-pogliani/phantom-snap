@@ -95,6 +95,16 @@ Page.prototype.getContent = function() {
 };
 
 /**
+ * Lists all the links in the page.
+ * @returns {Q.Promise} A promise that resolves to a list of links in the page.
+ */
+Page.prototype.listLinks = function() {
+  return this._verifyPhantom().then(function(page) {
+    return page._phantom.listLinksFor(page._phantom_id);
+  });
+};
+
+/**
  * Renders the page to a file.
  * @returns {Q.Promise} A promise that resolves when the page is saved.
  */
