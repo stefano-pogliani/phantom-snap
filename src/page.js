@@ -1,4 +1,5 @@
-var Q = require("q");
+var path = require("path");
+var Q    = require("q");
 
 
 /**
@@ -53,7 +54,7 @@ Page.prototype._verifyPhantom = function() {
   var deferred = Q.defer();
   if (this._phantom && this._phantom.isRunning() &&
       typeof this._phantom_id === "number") {
-    deferred.resolve();
+    deferred.resolve(this);
   } else {
     deferred.reject(new Error(
         "Page with uri '" + this.uri +
@@ -68,10 +69,11 @@ Page.prototype._verifyPhantom = function() {
  * @returns {Q.Promise} A promise that resolves when the page is closed.
  */
 Page.prototype.close = function() {
-  var page = this;
-  return this._verifyPhantom().then(function() {
-    return page._phantom.close(page._phantom_id);
-  }).then(function() {
+  return this._verifyPhantom().then(function(page) {
+    return page._phantom.close(page._phantom_id).then(function() {
+      return page;
+    });
+  }).then(function(page) {
     page.detachPhantom();
   });
 };
@@ -87,8 +89,18 @@ Page.prototype.detachPhantom = function() {
  * @returns {Q.Promise} A promise that resolves when the HTML is available.
  */
 Page.prototype.getContent = function() {
-  var page = this;
-  return this._verifyPhantom().then(function() {
+  return this._verifyPhantom().then(function(page) {
     return page._phantom.getContentFor(page._phantom_id);
+  });
+};
+
+/**
+ * Renders the page to a file.
+ * @returns {Q.Promise} A promise that resolves when the page is saved.
+ */
+Page.prototype.render = function(filename) {
+  var absolute = path.resolve(filename);
+  return this._verifyPhantom().then(function(page) {
+    return page._phantom.render(page._phantom_id, absolute);
   });
 };

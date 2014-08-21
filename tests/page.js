@@ -102,4 +102,19 @@ suite("Advanced page tests", function() {
       done(ex);
     });
   });
+
+  test("Render", function(done) {
+    this.fetcher.fetch("get-html.html").then(function(page) {
+      return page.render("./tests/render-result.png");
+    }).then(function() {
+      assert.equal(
+          fs.readFileSync(
+              "./tests/fixtures/expected-render.png", { encoding: "utf8" }),
+          fs.readFileSync("./tests/render-result.png", { encoding: "utf8" })
+      );
+      done();
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
 });

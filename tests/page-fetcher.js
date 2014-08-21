@@ -1,71 +1,62 @@
-var assert      = require("assert");
-var PageFetcher = require("../out/page-fetcher");
+var assert = require("assert");
+var path   = require("path");
+
+var PageFetcher  = require("../out/page-fetcher");
+var StaticServer = require("../out/static-server");
 
 
 suite("PageFetcher", function() {
   setup(function() {
+    var logger   = require("../out/silent-logger");
     this.fetcher = new PageFetcher({
-      base_url: "https://www.google.com",
-      logger:   require("../out/silent-logger")
+      base_url: "http://localhost:9000",
+      logger:   logger
     });
+
+    this.server = new StaticServer({
+      logger: logger,
+      path:   path.join(__dirname, "fixtures"),
+      port:   9000
+    });
+    this.server.start();
   });
 
+  teardown(function(done) {
+    var _this = this;
+    this.fetcher.stop().then(function() {
+      return _this.server.stop();
+    }).finally(function() {
+      done();
+    });
+  });
 
   test("Get Phantom", function(done) {
-    var _this     = this;
-    var instance1 = null;
-    var instance2 = null;
-    var result    = null;
-
+    var _this  = this;
     this.fetcher._getPhantom().then(function(phantom1) {
-      instance1 = phantom1;
       return _this.fetcher._getPhantom().then(function(phantom2) {
-        instance2 = phantom2;
         assert(phantom1 === phantom2);
+        done();
       });
     }).fail(function(ex) {
-      result = ex;
-    }).finally(function() {
-      var promise = null;
-
-      if(instance1) { promise = instance1.stop(); }
-      if (instance2 && instance1 !== instance2) {
-        if (promise) {
-          promise.then(function() {
-            return instance2.stop();
-          });
-        }
-      }
-
-      if (promise) {
-        promise.then(function() { done(result); });
-      } else {
-        done(new Error("No Phantom to stop."));
-      }
+      done(ex);
     });
   });
 
-  test("Fetch Google", function(done) {
+  test("Fetch Page", function(done) {
     var fetcher = this.fetcher;
-    var result  = undefined;
 
-    fetcher.fetch("").then(function(page) {
-      assert.equal("", page.uri);
-      assert.equal("Google", page.title);
+    fetcher.fetch("/get-html.html").then(function(page) {
+      assert.equal("/get-html.html", page.uri);
+      assert.equal("TITLE", page.title);
+      done();
 
     }).fail(function(ex) {
       // Intercept assert fails.
       if (ex instanceof Error) {
-        result = ex;
+        done(ex);
       } else {
-        result = new Error(JSON.stringify(ex));
+        done(new Error(JSON.stringify(ex)));
       }
-
-    }).finally(function() {
-      // Stop Phantom and complete test.
-      return fetcher.stop().then(function() {
-        done(result);
-      });
     });
   });
 

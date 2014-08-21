@@ -164,6 +164,7 @@ Controller.prototype._events.fetch = function(data, event_id) {
   var page       = this.createPage();
 
   page.open(data.url, function(status) {
+    controller._log("Page open succeeded: " + status);
     if (status !== "success") {
       controller.emitFail(event_id, status);
       return;
@@ -196,4 +197,24 @@ Controller.prototype._events.getContent = function(page_id, event_id) {
     return;
   }
   this.emit("gotContent", event_id, page.content);
+};
+
+/**
+ * Renders a page into a file.
+ * @param {!Object} data     The parameters for the render request.
+ * @param {!Number} event_id The id of the requesting event.
+ */
+Controller.prototype._events.render = function(data, event_id) {
+  var filename = data.filename;
+  var page_id  = data.id;
+  var page     = this._pages[page_id];
+
+  if (!page) {
+    this.emitFail(
+        event_id, "Invalid page identifier '" + page_id + "' for getContent.");
+    return;
+  }
+
+  page.render(filename);
+  this.emit("rendered", event_id);
 };

@@ -10,8 +10,9 @@ suite("PhantomJS Wrapper", function() {
   });
 
   test("failing fetch", function(done) {
+    this.timeout(4000);
     var phantom = this.phantom;
-    var result  = undefined;
+    var result  = null;
 
     phantom.spawn().then(function() {
       return phantom.fetch("non-existent-url", "");
@@ -38,7 +39,7 @@ suite("PhantomJS Wrapper", function() {
 
   test("fetch", function(done) {
     var phantom = this.phantom;
-    var result  = undefined;
+    var result  = null;
 
     phantom.spawn().then(function() {
       return phantom.fetch("https://www.google.com", "", "./waiters/noop");

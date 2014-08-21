@@ -144,6 +144,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
   this._register(socket, "fetched");
   this._register(socket, "gotContent");
   this._register(socket, "ready");
+  this._register(socket, "rendered");
   this._register(socket, "report-error");
 
   // Emit "connected" to trigger Phantom setup.
@@ -230,6 +231,19 @@ Phantom.prototype.getContentFor = function(page_id) {
  */
 Phantom.prototype.isRunning = function() {
   return !!(this._process || this._clear);
+};
+
+/**
+ * Renders a page.
+ * @param {!Number} page_id  The identifier of the page to render.
+ * @param {!String} filename The absolute path to the file to render to.
+ * @returns {Q.Promise} A promise that resolves when the render is complete.
+ */
+Phantom.prototype.render = function(page_id, filename) {
+  return this._emit("render", {
+    filename: filename,
+    id:       page_id
+  });
 };
 
 /**
