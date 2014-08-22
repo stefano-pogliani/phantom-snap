@@ -43,24 +43,32 @@ PageQueue.prototype.enqueue = function(uri) {
  * The return value of the callback is igored unless it is a promise, in which
  * case processing is paused until that promise completes.
  * 
- * @param {!Function} callback The operation to perform on each uri.
+ * @param {!Function} callback    The operation to perform on each uri.
+ * @param {=Number}   concurrency The number of concurrent promises to wait for.
  * @returns {Q.Promise} A promise that resolves when processing is done.
  */
-PageQueue.prototype.process = function(callback) {
-  var deferred = Q.defer();
-  var promise  = deferred.promise;
-  deferred.resolve();
+PageQueue.prototype.process = function(callback, concurrency) {
+  var promise  = null;
+  concurrency  = concurrency || 1;
 
   if (this._queue.count()) {
     var _this = this;
-    var uri   = this._queue.pop();
+    var max   = Math.min(concurrency, this._queue.count());
+    var vals  = [];
 
-    promise = promise.then(function() {
+    for (var idx = 0; idx < max; idx++) {
+      var uri = this._queue.pop();
       _this._logger.debug("Processing uri: %s", uri);
-      return callback(uri);
-    }).then(function() {
-      return _this.process(callback);
+      vals.push(callback(uri));
+    }
+
+    promise = Q.all(vals).then(function() {
+      return _this.process(callback, concurrency);
     });
+  } else {
+    var deferred = Q.defer();
+    promise = deferred.promise;
+    deferred.resolve();
   }
 
   return promise;

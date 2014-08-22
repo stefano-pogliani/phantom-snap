@@ -1,4 +1,5 @@
 var assert    = require("assert");
+var Q         = require("q");
 var PageQueue = require("../out/page-queue");
 
 
@@ -46,6 +47,29 @@ suite("PageQueue", function() {
       assert.deepEqual(popped, ["abc", "def"]);
       done();
 
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
+
+  test("process concurrency", function(done) {
+    var popped = [];
+    this.queue.enqueue(20);
+    this.queue.enqueue(10);
+    this.queue.enqueue(15);
+    this.queue.enqueue( 5);
+
+    this.queue.process(function(ms) {
+      var def = Q.defer();
+      setTimeout(function() {
+        def.resolve();
+      }, ms);
+      return def.promise.then(function() {
+        popped.push(ms);
+      });
+    }, 2).then(function() {
+      assert.deepEqual(popped, [10, 20, 5, 15]);
+      done();
     }).fail(function(ex) {
       done(ex);
     });
