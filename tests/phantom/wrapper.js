@@ -38,6 +38,7 @@ suite("PhantomJS Wrapper", function() {
   });
 
   test("fetch", function(done) {
+    this.timeout(4000);
     var phantom = this.phantom;
     var result  = null;
 
