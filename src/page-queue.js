@@ -19,16 +19,16 @@ var PageQueue = module.exports = function(options) {
 
 /**
  * Adds a uri to the queue the first time it is seen otherwise does nothing.
- * @param {!String} uri The uri to, possibly, enqueue.
- * @returns {!Boolean} True if the uri was added.
+ * @param {!Object} item The item to, possibly, enqueue. Usually this is a URI.
+ * @returns {!Boolean} True if the item was added.
  */
-PageQueue.prototype.enqueue = function(uri) {
-  if (uri in this._seen) {
-    this._logger.debug("Ingoring enqueue of visited uri: %s", uri);
+PageQueue.prototype.enqueue = function(item) {
+  if (item in this._seen) {
+    this._logger.debug("Ingoring enqueue of visited item: %s", item);
     return false;
   }
-  this._seen[uri] = true;
-  this._queue.push(uri);
+  this._seen[item] = true;
+  this._queue.push(item);
   return true;
 };
 
@@ -38,10 +38,13 @@ PageQueue.prototype.enqueue = function(uri) {
  * Each element is popped from the top and passed to callback.
  * Once the callback is completed the next element of the queue is processed
  * until there are no more elements.
- * The callback can therefore enqueue new elements, which will be processed.
+ * The callback can therefore enqueue new elements, which will be processed
+ * at a later stage of the current loop over the queue.
  * 
  * The return value of the callback is igored unless it is a promise, in which
  * case processing is paused until that promise completes.
+ * An optional conccurency level specifies how many promises are waited for
+ * at any given time.
  * 
  * @param {!Function} callback    The operation to perform on each uri.
  * @param {=Number}   concurrency The number of concurrent promises to wait for.
@@ -57,9 +60,9 @@ PageQueue.prototype.process = function(callback, concurrency) {
     var vals  = [];
 
     for (var idx = 0; idx < max; idx++) {
-      var uri = this._queue.pop();
-      _this._logger.debug("Processing uri: %s", uri);
-      vals.push(callback(uri));
+      var item = this._queue.pop();
+      _this._logger.debug("Processing item: %s", item);
+      vals.push(callback(item));
     }
 
     promise = Q.all(vals).then(function() {

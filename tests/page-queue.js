@@ -58,6 +58,7 @@ suite("PageQueue", function() {
     this.queue.enqueue(10);
     this.queue.enqueue(15);
     this.queue.enqueue( 5);
+    this.queue.enqueue( 1);
 
     this.queue.process(function(ms) {
       var def = Q.defer();
@@ -68,7 +69,7 @@ suite("PageQueue", function() {
         popped.push(ms);
       });
     }, 2).then(function() {
-      assert.deepEqual(popped, [10, 20, 5, 15]);
+      assert.deepEqual(popped, [10, 20, 5, 15, 1]);
       done();
     }).fail(function(ex) {
       done(ex);
