@@ -54,7 +54,6 @@ suite("Page", function() {
 suite("Advanced page tests", function() {
   setup(function() {
     var logger   = require("../out/silent-logger");
-    //var logger   = null;
     this.fetcher = new PageFetcher({
       base_url: "http://localhost:9000/",
       logger:   logger
