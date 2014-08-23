@@ -37,7 +37,7 @@ var Phantom = module.exports = function(options) {
   this._requests = {};
 
   this._app     = express();
-  this._logger  = options.logger || require("../default-logger");
+  this._logger  = options.logger || require("../loggers/default");
   this._server  = http.createServer(this._app);
   this._io      = socketio.listen(this._server);
 

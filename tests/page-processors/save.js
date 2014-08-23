@@ -26,7 +26,7 @@ var MockQueue = function() {
 suite("Processors > Save", function() {
   setup(function() {
     //var logger     = null;
-    var logger     = require("../../out/silent-logger");
+    var logger     = require("../../out/loggers/silent");
     this._base_url = "http://localhost:9000/";
 
     this.fetcher = new PageFetcher({

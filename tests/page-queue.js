@@ -6,7 +6,7 @@ var PageQueue = require("../out/page-queue");
 suite("PageQueue", function() {
   setup(function() {
     this.queue = new PageQueue({
-      logger: require("../out/silent-logger")
+      logger: require("../out/loggers/silent")
     });
   });
 

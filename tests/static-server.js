@@ -8,7 +8,7 @@ var StaticServer = require("../out/static-server");
 suite("StaticServer", function() {
   setup(function() {
     this.server = new StaticServer({
-      logger: require("../out/silent-logger"),
+      logger: require("../out/loggers/silent"),
       path:   path.join(__dirname, "fixtures"),
       port:   9000
     });

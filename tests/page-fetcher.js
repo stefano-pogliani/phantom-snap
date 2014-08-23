@@ -7,7 +7,7 @@ var StaticServer = require("../out/static-server");
 
 suite("PageFetcher", function() {
   setup(function() {
-    var logger   = require("../out/silent-logger");
+    var logger   = require("../out/loggers/silent");
     this.fetcher = new PageFetcher({
       base_url: "http://localhost:9000",
       logger:   logger

@@ -15,7 +15,7 @@ var Q       = require("q");
  */
 var StaticServer = module.exports = function(options) {
   this.app    = express();
-  this.logger = options.logger || require("./default-logger");
+  this.logger = options.logger || require("./loggers/default");
   this.path   = options.path;
   this.port   = options.port || 8080;
   this.server = null;

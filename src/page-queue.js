@@ -12,7 +12,7 @@ var Queue = require("./queue");
  *     * logger: An optional logger object to use.
  */
 var PageQueue = module.exports = function(options) {
-  this._logger = options.logger || require("./default-logger");
+  this._logger = options.logger || require("./loggers/default");
   this._queue  = new Queue();
   this._seen   = {};
 };

@@ -16,7 +16,7 @@ suite("Page", function() {
 
   test("Phantom detach", function(done) {
     // Prepare.
-    var logger   = require("../out/silent-logger");
+    var logger   = require("../out/loggers/silent");
     var fetcher = new PageFetcher({
       base_url: "http://localhost:9000/",
       logger:   logger
@@ -53,7 +53,7 @@ suite("Page", function() {
 
 suite("Advanced page tests", function() {
   setup(function() {
-    var logger   = require("../out/silent-logger");
+    var logger   = require("../out/loggers/silent");
     this.fetcher = new PageFetcher({
       base_url: "http://localhost:9000/",
       logger:   logger
