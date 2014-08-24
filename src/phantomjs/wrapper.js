@@ -94,7 +94,7 @@ Phantom.prototype._attachToProcess = function(proc) {
  * @returns {!Q.Promise} A promise that resolves when a reply to the event
  *                       is received.
  */
-Phantom.prototype._emit = function(event, data) {
+Phantom.prototype.emit = function(event, data) {
   var deferred   = Q.defer();
   var identifier = this._request_id++;
   this._requests[identifier] = deferred;
@@ -158,7 +158,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
   this._register(socket, "report-error");
 
   // Emit "connected" to trigger Phantom setup.
-  this._emit("connected").then(function() {
+  this.emit("connected").then(function() {
     _this._ready.resolve(_this);
   });
 };
@@ -206,7 +206,7 @@ Phantom.prototype._handlePhantomExit = function(code) {
  */
 Phantom.prototype.fetch = function(host, uri, waiter_options) {
   var _this = this;
-  return this._emit("fetch", {
+  return this.emit("fetch", {
     url:            host + uri,
     waiter_options: waiter_options
   }).then(function(page_info) {
@@ -225,7 +225,7 @@ Phantom.prototype.fetch = function(host, uri, waiter_options) {
  */
 Phantom.prototype.close = function(page_id) {
   var _this = this;
-  return this._emit("close", page_id).then(function() {
+  return this.emit("close", page_id).then(function() {
     var page_index = _this._pages.indexOf(page_id);
     _this._pages.splice(page_index, 1);
   });
@@ -237,7 +237,7 @@ Phantom.prototype.close = function(page_id) {
  * @returns {Q.Promise} A promise that resolves with the content.
  */
 Phantom.prototype.getContentFor = function(page_id) {
-  return this._emit("getContent", page_id);
+  return this.emit("getContent", page_id);
 };
 
 /**
@@ -253,7 +253,7 @@ Phantom.prototype.isRunning = function() {
  * @returns {Q.Promise} A promise that resolves to a list of links.
  */
 Phantom.prototype.listLinksFor = function(page_id) {
-  return this._emit("listLinks", page_id);
+  return this.emit("listLinks", page_id);
 };
 
 /**
@@ -263,7 +263,7 @@ Phantom.prototype.listLinksFor = function(page_id) {
  * @returns {Q.Promise} A promise that resolves when the render is complete.
  */
 Phantom.prototype.render = function(page_id, filename) {
-  return this._emit("render", {
+  return this.emit("render", {
     filename: filename,
     id:       page_id
   });

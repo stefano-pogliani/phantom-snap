@@ -260,3 +260,48 @@ Controller.prototype._events.render = function(data, event_id) {
   page.render(filename);
   this.emit("rendered", event_id);
 };
+
+
+/*** Debug events Handlers ***/
+Controller.prototype._debug_events = {};
+
+
+/**
+ * Handes a debug event.
+ * A debug event is essentially an event wrapped in an event of type "debug".
+ * This allows events and debug events not to collide with each other.
+ * 
+ * @param {!Object} data     The parameters for the debug event.
+ * @param {!Number} event_id The id of the requesting event.
+ */
+Controller.prototype._events.debug = function(data, event_id) {
+  var event   = data.event;
+  var handler = this._debug_events[event];
+
+  if (handler) {
+    try {
+      handler.call(this, data, event_id);
+      this._log("Handled debug event '" + event + "' (id: " + event_id + ").");
+    } catch(err) {
+      this._log(
+          "Error handling debug event '" + event + "' (id: " + event_id + ").");
+      this._log(err.stack);
+      this.emitFail(event_id, {
+        message: err.message,
+        trace:   err.stack,
+        type:    "exception"
+      });
+    }
+  } else {
+    this.emitFail(
+        event_id, "Could not handle unkown debug event '" + event + "'");
+  }
+};
+
+/**
+ * Throws a generic exception with the given message.
+ * @param {!Object} data The parameters for the exception.
+ */
+Controller.prototype._debug_events.exception = function(data) {
+  throw new Error(data.message);
+};

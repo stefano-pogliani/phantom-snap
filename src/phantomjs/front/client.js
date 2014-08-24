@@ -50,6 +50,7 @@ define(function(require) {
     registerEvent("exit");
     registerIdentifiedEvent("close");
     registerIdentifiedEvent("connected");
+    registerIdentifiedEvent("debug");
     registerIdentifiedEvent("fetch");
     registerIdentifiedEvent("getContent");
     registerIdentifiedEvent("listLinks");

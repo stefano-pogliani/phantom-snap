@@ -50,6 +50,25 @@ suite("PhantomJS Wrapper > pre-spawn", function() {
     });
   });
 
+  test("exception", function(done) {
+    this.phantom.emit("debug", {
+      event:   "exception",
+      message: "Intentional exception."
+
+    }).then(function() {
+      done(new Error("debug.exception did not fail."));
+
+    }).fail(function(ex) {
+      assert(ex instanceof Error);
+      assert.equal(ex.message, "Intentional exception.");
+      done();
+
+    }).fail(function(ex) {
+      // Intercept assert failures.
+      done(ex);
+    });
+  });
+
   test("failing fetch", function(done) {
     this.timeout(4000);
     this.phantom.fetch("non-existent-url", "").then(function() {
