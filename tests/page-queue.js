@@ -4,10 +4,15 @@ var PageQueue = require("../out/page-queue");
 
 
 suite("PageQueue", function() {
-  setup(function() {
-    this.queue = new PageQueue({
+  var createQueue = function(key) {
+    return new PageQueue({
+      key:    key,
       logger: require("../out/loggers/silent")
     });
+  };
+  
+  setup(function() {
+    this.queue = createQueue();
   });
 
   test("enqueue", function() {
@@ -70,6 +75,29 @@ suite("PageQueue", function() {
       });
     }, 2).then(function() {
       assert.deepEqual(popped, [10, 20, 5, 15, 1]);
+      done();
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
+
+  test("objects", function(done) {
+    var popped = [];
+    this.queue = createQueue(function(obj) {
+      return obj.key;
+    });
+
+    this.queue.enqueue({key: 0});
+    this.queue.enqueue({key: 1});
+    this.queue.enqueue({key: 0});
+
+    this.queue.process(function(obj) {
+      popped.push(obj);
+    }).then(function() {
+      assert.deepEqual(popped, [
+        { key: 0 },
+        { key: 1 }
+      ]);
       done();
     }).fail(function(ex) {
       done(ex);

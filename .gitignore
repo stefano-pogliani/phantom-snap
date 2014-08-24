@@ -8,5 +8,5 @@ src/node_modules/
 
 coverage.html
 tests/render-result.png
-tests/page-processors/links.html
+tests/processors/links.html
 

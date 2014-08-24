@@ -10,8 +10,11 @@ var Queue = require("./queue");
  *   The options to customise the behaviour of the queue.
  *   Possible attributes are:
  *     * logger: An optional logger object to use.
+ *     * key:    A function to extract a key out of in item.
+ *               Defaults to the identity function.
  */
 var PageQueue = module.exports = function(options) {
+  this._key    = options.key    || function(x) { return x; };
   this._logger = options.logger || require("./loggers/default");
   this._queue  = new Queue();
   this._seen   = {};
@@ -23,11 +26,12 @@ var PageQueue = module.exports = function(options) {
  * @returns {!Boolean} True if the item was added.
  */
 PageQueue.prototype.enqueue = function(item) {
-  if (item in this._seen) {
-    this._logger.debug("Ingoring enqueue of visited item: %s", item);
+  var key = this._key(item);
+  if (key in this._seen) {
+    this._logger.debug("Ingoring enqueue of visited item with key: %s", key);
     return false;
   }
-  this._seen[item] = true;
+  this._seen[key] = true;
   this._queue.push(item);
   return true;
 };
