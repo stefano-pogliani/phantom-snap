@@ -1,5 +1,5 @@
 var assert = require("assert");
-var Base   = require("../../out/page-processors/base");
+var Base   = require("../../out/processors/base");
 
 var Demo = function Demo() {
   Base.call(this);

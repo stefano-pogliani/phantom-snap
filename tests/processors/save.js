@@ -3,7 +3,7 @@ var fs     = require("fs");
 var path   = require("path");
 
 var PageFetcher  = require("../../out/page-fetcher");
-var Save         = require("../../out/page-processors/save");
+var Save         = require("../../out/processors/save");
 var StaticServer = require("../../out/static-server");
 
 
