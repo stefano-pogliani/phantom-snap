@@ -15,11 +15,14 @@ var Phantom = require("./phantomjs/wrapper");
  *     * base_url: The base URL of the pages, should include trailing `/`.
  *     * logger: Object used for logging.
  *     * phantom_port: The port for the Phantom server to listent to.
- *     * waiter_path: Path to the module implementing the PageLoader.
+ *     * waiter_options:
+ *         Options for the LoadWaiter.
+ *         The path of the module to load the waiter from is in the path
+ *         attribute of this option objects.
  */
 var PageFetcher = module.exports = function(options) {
-  this._base        = options.base_url    || "http://localhost:8080/";
-  this._waiter_path = options.waiter_path || "./waiters/noop";
+  this._base           = options.base_url       || "http://localhost:8080/";
+  this._waiter_options = options.waiter_options || { path: "./waiters/noop" };
   this._phantom     = new Phantom({
     logger: options.logger,
     port:   options.phantom_port
@@ -50,7 +53,7 @@ PageFetcher.prototype._getPhantom = function() {
 PageFetcher.prototype.fetch = function(uri) {
   var _this = this;
   return this._getPhantom().then(function(phantom) {
-    return phantom.fetch(_this._base, uri, _this._waiter_path);
+    return phantom.fetch(_this._base, uri, _this._waiter_options);
   });
 };
 

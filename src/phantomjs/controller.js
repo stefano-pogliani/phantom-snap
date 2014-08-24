@@ -172,8 +172,9 @@ Controller.prototype._events.fetch = function(data, event_id) {
 
     try {
 
-      var page_id = controller._page_id++;
-      var waiter  = require(data.waiter_path)(data.waiter_options);
+      var page_id    = controller._page_id++;
+      var waiter_ops = data.waiter_options;
+      var waiter     = require(waiter_ops.path)(waiter_ops);
       controller._pages[page_id] = page;
 
       // Wait for page to (really) load.

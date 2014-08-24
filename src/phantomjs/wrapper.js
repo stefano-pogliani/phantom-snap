@@ -194,17 +194,21 @@ Phantom.prototype._handlePhantomExit = function(code) {
 /**
  * Requests to Phantom to fetch a new page.
  * 
- * @param {!String} host        The host where the resource is located.
- * @param {!String} uri         The identifier of the resource on the host.
- * @param {!String} waiter_path The path to the Phantom module that defines the
- *                              LoadWaiter to use with this page.
+ * @param {!String} host           The host where the resource is located.
+ * @param {!String} uri            The identifier of the resource on the host.
+ * @param {!String} waiter_options
+ *   The options to set up the LoadWaiter in Phantom.
+ *   The path attribute is a path to the Phantom module that defines the
+ *   LoadWaiter to use with this page, all other properties are passed
+ *   to the LoadWaiter initialisation function.
+ *   
  * @returns {!Q.Promise} A promise that resolves to the loaded page.
  */
-Phantom.prototype.fetch = function(host, uri, waiter_path) {
+Phantom.prototype.fetch = function(host, uri, waiter_options) {
   var _this = this;
   return this._emit("fetch", {
-    url:         host + uri,
-    waiter_path: waiter_path
+    url:            host + uri,
+    waiter_options: waiter_options
   }).then(function(page_info) {
     var page = new Page(_this, uri);
     page._phantom_id = page_info.id;
