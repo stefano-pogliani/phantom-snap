@@ -81,7 +81,7 @@ CrawlingDriver.prototype.start = function() {
     server.start();
   }
 
-  this._logger.info("Starting to crawl form: /");
+  this._logger.info("Starting to crawl form: %s", this._index);
   this._queue.enqueue({
     uri:   this._index,
     depth: 0
