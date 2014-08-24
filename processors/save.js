@@ -20,6 +20,7 @@ var Base = require("./base");
  * @param {!PageQueue} queue     A PageQueue instance to store newly discovered
  *                               pages.
  * @param {=PageGraph} graph     A PageGraph instance that traks the site map.
+ * @param {=Object}    logger    Instance of the logger to use.
  */
 var SaveProcessor = module.exports = function SaveProcessor(
     base_url, base_path, queue, graph, logger) {
@@ -52,9 +53,30 @@ SaveProcessor.prototype.process = function(page) {
   var dir      = path.dirname(out_file);
 
   return page.getContent().then(function(content) {
-    return Q.fcall(fs.exists, dir).then(function(exists) {
-      if (!exists) {
+    _this._logger.debug("Checking existence of '%s' ...", dir);
+
+    return Q.nfcall(fs.stat, dir).then(function(stat) {
+      if (stat.isFile()) {
+        _this._logger.info("File collision detected for '%s'.", dir);
+
+        return Q.nfcall(
+            fs.rename, dir, dir + ".phantom.snap.tmp").then(function() {
+          return Q.nfcall(mkdirp, dir);
+
+        }).then(function() {
+          return Q.nfcall(
+              fs.rename, dir + ".phantom.snap.tmp",
+              path.join(dir, "index.html")
+          );
+        });
+      }
+
+    }).fail(function(ex) {
+      if (ex.errno === 34) {
+        _this._logger.debug("Creating '%s' ...", dir);
         return Q.nfcall(mkdirp, dir);
+      } else {
+        throw ex;
       }
 
     }).then(function() {
