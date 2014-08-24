@@ -14,12 +14,13 @@ module.exports = function(grunt) {
       function() {
     var done    = this.async();
     var options = this.options({
-      vebose_logging: null
-    });
+      global:         {},
+      verbose_logging: null
+    }, grunt.config.get("snapshot"));
 
     // Pre-process options as needed.
     if (options.verbose_logging !== null) {
-      options.logger = require(
+      options.global.logger = require(
           options.verbose_logging ?
           "../loggers/verbose" :
           "../loggers/silent"

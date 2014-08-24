@@ -65,7 +65,7 @@ PageQueue.prototype.process = function(callback, concurrency) {
 
     for (var idx = 0; idx < max; idx++) {
       var item = this._queue.pop();
-      _this._logger.debug("Processing item: %s", item);
+      _this._logger.debug("Processing item with key: %s", this._key(item));
       vals.push(callback(item));
     }
 
