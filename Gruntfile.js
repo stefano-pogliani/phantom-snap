@@ -8,11 +8,17 @@ module.exports = function(grunt) {
     },
 
     copy: {
-      sources: {
-        expand: true,
+      devel: {
         cwd:    "src/",
-        src:    ["**"],
-        dest:   "out"
+        dest:   "out",
+        expand: true,
+        src:    ["**"]
+      },
+      release: {
+        cwd:    "src/",
+        dest:   "out",
+        expand: true,
+        src:    ["**", "!**/node_modules/**"]
       }
     },
 
@@ -75,7 +81,7 @@ module.exports = function(grunt) {
 
   // Plugins.
   grunt.loadNpmTasks("grunt-contrib-clean");
-  grunt.loadNpmTasks("grunt-contrib-compress");
+  //grunt.loadNpmTasks("grunt-contrib-compress");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-jshint");
   grunt.loadNpmTasks("grunt-mocha-test");
@@ -83,13 +89,12 @@ module.exports = function(grunt) {
 
   // Tasks
   grunt.registerTask("devel", [
-    "clean:out", "jshint", "copy"
+    "clean:out", "jshint", "copy:devel"
   ]);
-  //grunt.registerTask("release", [
-  //  "clean:out", "jshint", "copy", "less:release"
-  //]);
+  grunt.registerTask("release", [
+    "clean:out", "jshint", "copy:release"
+  ]);
   grunt.registerTask("test", ["devel", "npm-install", "mochaTest"]);
 
-  //grunt.registerTask("default", "release");
-
+  grunt.registerTask("default", "release");
 };

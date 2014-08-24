@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# ***********
+# * Read me *
+# ***********
+#
+# Before this script can be used a few operations are required.
+# First of all create a new git empty branch with no parent called release:
+#   git checkout --orphan release
+#
+# By the way, this command will also move you to that branch.
+#
+# Run git status to see everything marked as new.
+# Undo that with git reset.
+# Now include .gitignore and create the first commit, which of course will be
+# empty.
+#
+# This step is a little scary:
+# You need to checkout the branch you want to release but git will not like it.
+# Try a normal checkout and see way.
+# You will have to force checkout the branch, but do so only if you understand
+# the implications. If you do not, create a dummy repo and play with that first.
+#
+# Finally you should be able to simply run this script, which will:
+# 1 - Run grunt to build your stuff (it is assumed the default task will
+#     know what to do an that the result will be in the `out` directory).
+# 2 - Checkout the new release branch.
+#     All your git-tracked files in the branch will be deleted and replaced
+#     by the files in that branch. This will clear out all your project files.
+# 3 - Everything in out is copied into the root directory.
+# 4 - You are ready to commit the new release.
+#
+# NOTE: if you deleted or renamed files you will find the original again.
+#       In case large refactoring you may want to consider manually deleting
+#       all files and coping out/* again.
+#
+
+
+grunt && git checkout release && cp out/* . && (
+  echo "Environment ready for git commit."
+  echo "Don't forget to create a tag as well."
+)
+
