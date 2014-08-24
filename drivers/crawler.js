@@ -47,6 +47,7 @@ var CrawlingDriver = module.exports = function CrawlingDriver(options) {
   // Store options for later.
   this._index  = crawler_opts.index  || "index.html";
   this._logger = crawler_opts.logger || require("../loggers/default");
+  queue_opts.key = function(item) { return item.uri; };
 
   // Create required objects.
   this._fetcher = new PageFetcher(fetcher_opts);

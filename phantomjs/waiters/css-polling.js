@@ -1,4 +1,9 @@
-// ?
+/**
+ * Waits for an element in the page with the specified CSS property and value.
+ * @class CssPollingLoadWaiter
+ * 
+ * @param {!Object} options The options to configure the waiter.
+ */
 var CssPollingLoadWaiter = function(options) {
   if (!options.property) {
     throw new Error("A CSS property is mandatory.");
