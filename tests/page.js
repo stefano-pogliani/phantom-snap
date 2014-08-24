@@ -132,7 +132,9 @@ suite("Advanced page tests", function() {
               "./tests/fixtures/expected-render.png", { encoding: "utf8" }),
           fs.readFileSync("./tests/render-result.png", { encoding: "utf8" })
       );
+      fs.unlinkSync("./tests/render-result.png");
       done();
+
     }).fail(function(ex) {
       done(ex);
     });

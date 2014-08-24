@@ -64,6 +64,7 @@ suite("Processors > Save", function() {
           fs.readFileSync(path.join(__dirname, "links.html"), encoding),
           fs.readFileSync("./tests/fixtures/links-res.html", encoding)
       );
+      fs.unlinkSync(path.join(__dirname, "links.html"));
 
       // Assert elements in queue.
       assert.deepEqual(queue.queue, [{
@@ -79,6 +80,33 @@ suite("Processors > Save", function() {
           title: "Internal"
         }
       }]);
+      done();
+
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
+
+  test("nested paths", function(done) {
+    var graph     = new MockGraph();
+    var queue     = new MockQueue();
+    var processor = new Save(this._base_url, __dirname, queue, graph);
+    this.fetcher.fetch("nested/get-html.html").then(function(page) {
+      return processor.process(page);
+    }).then(function() {
+
+      // Assert file.
+      var encoding = { encoding: "utf8" };
+      assert.equal(
+          fs.readFileSync(path.join(__dirname, "nested", "get-html.html"),
+                          encoding),
+          fs.readFileSync("./tests/fixtures/get-html-res.html", encoding)
+      );
+
+      // Delete saved file and its directory.
+      fs.unlinkSync(path.join(__dirname, "nested", "get-html.html"));
+      fs.rmdirSync(path.join(__dirname, "nested"));
+
       done();
     }).fail(function(ex) {
       done(ex);

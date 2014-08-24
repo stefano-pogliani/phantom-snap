@@ -1,6 +1,7 @@
-var fs   = require("fs");
-var path = require("path");
-var Q    = require("q");
+var fs     = require("fs");
+var path   = require("path");
+var mkdirp = require("mkdirp");
+var Q      = require("q");
 
 var Base = require("./base");
 
@@ -21,11 +22,12 @@ var Base = require("./base");
  * @param {=PageGraph} graph     A PageGraph instance that traks the site map.
  */
 var SaveProcessor = module.exports = function SaveProcessor(
-    base_url, base_path, queue, graph) {
+    base_url, base_path, queue, graph, logger) {
   Base.call(this);
-  this._base_url  = base_url;
+  this._base_url  = base_url || "http://localhost:8080/";
   this._base_path = base_path;
   this._graph     = graph;
+  this._logger    = logger || require("../loggers/default");
   this._queue     = queue;
 };
 Base.extendConstructor(SaveProcessor);
@@ -45,9 +47,21 @@ SaveProcessor.prototype.process = function(page) {
   // TODO: need to deal with # and #! in uri.
   //       for now it is possible to include it in the base URL.
   var _this    = this;
-  var out_file = path.join(this._base_path, page.uri);
+  var out_file = path.join(
+      this._base_path, page.uri === "/" ? "index.html" : page.uri);
+  var dir      = path.dirname(out_file);
 
   return page.getContent().then(function(content) {
+    return Q.fcall(fs.exists, dir).then(function(exists) {
+      if (!exists) {
+        return Q.nfcall(mkdirp, dir);
+      }
+
+    }).then(function() {
+      return content;
+    });
+
+  }).then(function(content) {
     // Write content to file.
     return Q.nfcall(fs.writeFile, out_file, content);
 
@@ -75,5 +89,8 @@ SaveProcessor.prototype.process = function(page) {
         _this._graph.link(page.uri, link);
       }
     }
+  }).fail(function(ex) {
+    _this._logger.error("Processing page failed: %s.", ex.message);
+    throw ex;
   });
 };

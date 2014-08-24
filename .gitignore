@@ -7,6 +7,4 @@ out/
 src/node_modules/
 
 coverage.html
-tests/render-result.png
-tests/processors/links.html
 
