@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Waiting ...</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script type="text/javascript">
+      setTimeout(function() {
+        var waiter = document.querySelector("#wait-target");
+        waiter.style.display = "none";
+        document.title = "Done waiting.";
+      }, 250);
+    </script>
+  </head>
+  <body>
+    <div id="wait-target">Waiting ...</div>
+  </body>
+</html>
