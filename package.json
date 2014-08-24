@@ -5,6 +5,7 @@
 
   "dependencies": {
     "express":    "~4.8.4",
+    "mkdirp":     "*",
     "phantomjs":  "~1.9.7",
     "q":          "~1.0.1",
     "socket.io":  "~1.0.6",

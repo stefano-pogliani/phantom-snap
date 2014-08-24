@@ -50,12 +50,14 @@ var CrawlingDriver = module.exports = function CrawlingDriver(options) {
   queue_opts.key = function(item) { return item.uri; };
 
   // Create required objects.
-  this._fetcher = new PageFetcher(fetcher_opts);
-  this._graph   = null;
-  this._queue   = new PageQueue(queue_opts);
-  this._server  = options.static ? new StaticServer(static_opts) : null;
+  this._fetcher   = new PageFetcher(fetcher_opts);
+  this._graph     = null;
+  this._queue     = new PageQueue(queue_opts);
+  this._server    = options.static ? new StaticServer(static_opts) : null;
   this._processor = new SaveProcessor(
-      fetcher_opts.base_url, crawler_opts.base_path, this._queue, this._graph);
+      fetcher_opts.base_url, crawler_opts.base_path, this._queue, this._graph,
+      global_opts.logger
+  );
 };
 
 /**
