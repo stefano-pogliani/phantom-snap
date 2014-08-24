@@ -1,6 +1,8 @@
 var system  = require("system");
 var webpage = require("webpage");
 
+var patchPage = require("./patch-page");
+
 
 /**
  * Phantom side controller that comunicates with Node.
@@ -78,7 +80,11 @@ Controller.prototype.connect = function() {
  */
 Controller.prototype.createPage = function() {
   var page = webpage.create();
+
   page.settings.userAgent = "PhantomSnap";
+  page.onInitialized = function() {
+    patchPage(page);
+  };
 
   if (this._debug) {
     page.onConsoleMessage = function(msg) {

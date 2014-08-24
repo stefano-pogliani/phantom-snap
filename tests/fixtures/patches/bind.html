@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TODO supply a title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript">
+      var Changer = function() {
+        this.title = "Changed!";
+      };
+
+      Changer.prototype.do = function() {
+        console.log("B");
+        var waiter = document.querySelector("#ready");
+        waiter.style.display = "none";
+        document.title = this.title;
+      };
+
+      var changer = new Changer();
+      console.log("A");
+      setTimeout(changer.do.bind(changer), 50);
+    </script>
+
+  </head>
+  <body>
+    <div id="ready"></div>
+  </body>
+</html>
