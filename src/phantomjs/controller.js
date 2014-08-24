@@ -1,3 +1,4 @@
+var system  = require("system");
 var webpage = require("webpage");
 
 
@@ -24,7 +25,7 @@ var Controller = module.exports = function(port, debug) {
 
   if (this._debug) {
     this._control_page.onConsoleMessage = function(msg) {
-      console.log(msg);
+      system.stdout.write(msg);
     };
   }
 };

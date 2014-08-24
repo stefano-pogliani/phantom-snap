@@ -168,7 +168,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
  * @param {!String} chunck The data from stderr.
  */
 Phantom.prototype._handleStdErrData = function(chunck) {
-  this._logger.debug("PhantomJS reported and error: " + chunck);
+  this._logger.debug("[Phantom] >> " + chunck);
 };
 
 /**
@@ -176,7 +176,7 @@ Phantom.prototype._handleStdErrData = function(chunck) {
  * @param {!String} chunck The data from stdout.
  */
 Phantom.prototype._handleStdOutData = function(chunck) {
-  this._logger.debug("PhantomJS reported: " + chunck);
+  this._logger.debug("[Phantom]: " + chunck);
 };
 
 /**
