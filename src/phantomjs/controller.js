@@ -64,7 +64,7 @@ Controller.prototype._handleFromPage = function(event_data) {
  */
 Controller.prototype._log = function(msg) {
   if (this._debug) {
-    console.log(msg);
+    system.stdout.write(msg);
   }
 };
 
@@ -73,7 +73,7 @@ Controller.prototype.connect = function() {
   this._control_page.open(
       "http://127.0.0.1:" + this._port + "/", function(status) {
     if (status !== "success") {
-      console.error("Unable to connect to control page.");
+      system.stderr.write("Unable to connect to control page.");
       phantom.exit(1);
     }
   });

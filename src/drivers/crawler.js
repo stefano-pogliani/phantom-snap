@@ -92,7 +92,9 @@ CrawlingDriver.prototype.start = function() {
     var logger = this._logger;
     promise = promise.then(function() {
       logger.debug("Crawler stopping static server.");
-      return server.stop();
+      return server.stop().then(function() {
+        logger.info("Crawler done.");
+      });
     });
   }
   return promise;
