@@ -1,0 +1,13 @@
+{
+  "name":        "phantom-snap",
+  "version":     "0.0.0",
+  "description": "client side generated page snapshooting.",
+
+  "dependencies": {
+    "express":    "~4.8.4",
+    "phantomjs":  "~1.9.7",
+    "q":          "~1.0.1",
+    "socket.io":  "~1.0.6",
+    "underscore": "~1.6.0"
+  }
+}
