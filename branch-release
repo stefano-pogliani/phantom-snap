@@ -36,7 +36,7 @@
 #
 
 
-grunt && git checkout release && cp out/* . && (
+grunt && git checkout release && cp -r out/* . && (
   echo "Environment ready for git commit."
   echo "Don't forget to create a tag as well."
 )
