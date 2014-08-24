@@ -13,7 +13,9 @@ var Phantom = require("./phantomjs/wrapper");
  *   Options to customise the behaviour of the fetcher.
  *   Available options are:
  *     * base_url: The base URL of the pages, should include trailing `/`.
+ *     * logger: Object used for logging.
  *     * phantom_port: The port for the Phantom server to listent to.
+ *     * waiter_path: Path to the module implementing the PageLoader.
  */
 var PageFetcher = module.exports = function(options) {
   this._base        = options.base_url    || "http://localhost:8080/";

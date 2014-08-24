@@ -116,8 +116,17 @@ Phantom.prototype._register = function(socket, event) {
     _this._logger.debug("Received event '%s'.", event);
     if (_this._requests[id]) {
       if (data && typeof data === "object" && data.__phantom_error) {
-        _this._requests[id].reject(data.data, event);
+
+        if (typeof data.data.type === "string" &&
+            data.data.type === "exception") {
+          var err   = new Error(data.data.message);
+          err.stack = data.data.trace;
+          _this._requests[id].reject(err, event);
+        } else {
+          _this._requests[id].reject(data.data, event);
+        }
         _this._logger.debug("Rejected event id: %d.", id);
+
       } else {
         _this._requests[id].resolve(data, event);
         _this._logger.debug("Resolved event id: %d.", id);

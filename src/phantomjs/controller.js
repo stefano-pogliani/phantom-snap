@@ -170,17 +170,29 @@ Controller.prototype._events.fetch = function(data, event_id) {
       return;
     }
 
-    var page_id = controller._page_id++;
-    var waiter  = require(data.waiter_path);
-    controller._pages[page_id] = page;
+    try {
 
-    // Wait for page to (really) load.
-    waiter.wait(page, function() {
-      controller.emit("fetched", event_id, {
-        id:    page_id,
-        title: page.title
+      var page_id = controller._page_id++;
+      var waiter  = require(data.waiter_path)(data.waiter_options);
+      controller._pages[page_id] = page;
+
+      // Wait for page to (really) load.
+      waiter.wait(page, function() {
+        controller.emit("fetched", event_id, {
+          id:    page_id,
+          title: page.title
+        });
       });
-    });
+
+    } catch(err) {
+      controller._log("Error waiting for page '" + data.url + "'.");
+      controller._log(err.stack);
+      controller.emitFail(event_id, {
+        message: err.message,
+        trace:   err.stack,
+        type:    "exception"
+      });
+    }
   });
 };
 

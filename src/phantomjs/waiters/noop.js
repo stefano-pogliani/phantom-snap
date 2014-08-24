@@ -1,4 +1,4 @@
-var NoopLoadWaiter = module.exports = {};
+var NoopLoadWaiter = {};
 
 /**
  * Resume execution when the content of the page was effectivly loaded as
@@ -12,4 +12,17 @@ var NoopLoadWaiter = module.exports = {};
  */
 NoopLoadWaiter.wait = function(page, ready) {
   ready();
+};
+
+/**
+ * Each waiter module is expected to export a function that will return the
+ * waiter.
+ * A waiter is only required to have a wait function attached, how that
+ * happens is up to you.
+ * 
+ * @param {Object} options The options required to initialize the module.
+ * @returns {NoopLoadWaiter}
+ */
+module.exports = function(options) {
+  return NoopLoadWaiter;
 };
