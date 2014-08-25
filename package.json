@@ -1,6 +1,5 @@
 {
   "name":        "phantom-snap-devel",
-  "version":     "0.0.0",
   "description": "Development package for PhantomSnap.",
 
   "devDependencies": {
