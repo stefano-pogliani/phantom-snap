@@ -171,7 +171,7 @@ Controller.prototype._events.fetch = function(data, event_id) {
   var page       = this.createPage();
 
   page.open(data.url, function(status) {
-    controller._log("Page open succeeded: " + status);
+    controller._log("Page open: " + status);
     if (status !== "success") {
       controller.emitFail(event_id, status);
       return;
