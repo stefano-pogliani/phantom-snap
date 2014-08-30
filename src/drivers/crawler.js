@@ -43,13 +43,6 @@ var CrawlingDriver = module.exports = function CrawlingDriver(options) {
   var fetcher_opts   = _.extend({}, global_opts, options.fetcher);
   var queue_opts     = _.extend({}, global_opts, options.queue);
   var static_opts    = _.extend({}, global_opts, options.static);
-  var processor_opts = _.extend({}, global_opts, options.processor, {
-    base_url:  fetcher_opts.base_url,
-    base_path: crawler_opts.base_path,
-    graph:     this._graph,
-    logger:    global_opts.logger,
-    queue:     this._queue
-  });
 
   // Store options for later.
   this._index  = crawler_opts.index  || "index.html";
@@ -61,6 +54,15 @@ var CrawlingDriver = module.exports = function CrawlingDriver(options) {
   this._graph     = null;
   this._queue     = new PageQueue(queue_opts);
   this._server    = options.static ? new StaticServer(static_opts) : null;
+
+  // Finish off by loading the processor with the correct options.
+  var processor_opts = _.extend({}, global_opts, options.processor, {
+    base_url:  fetcher_opts.base_url,
+    base_path: crawler_opts.base_path,
+    graph:     this._graph,
+    logger:    global_opts.logger,
+    queue:     this._queue
+  });
   this._processor = new SaveProcessor(processor_opts);
 };
 

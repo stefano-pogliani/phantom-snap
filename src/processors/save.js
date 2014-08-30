@@ -9,23 +9,21 @@ var Base = require("./base");
 /**
  * PageProcessor to crawl an entire website and save it as static pages.
  * 
- * @param {!String} base_url
- *   The base URL of each page.
- *   This includes things like the protocol, domain and port as well as
- *   initial portion of each URI.
- *   When using the StaticServer, this will look something like:
- *   http://localhost:9000/
- *
  * @param {!Object} options
  *  Object with the following options:
  *    * {=String}    base_href Href value for the optional base tag.
  *                             Tag is added only if this is specified.
- *    * {=String}    base_url  The url to start crawling.
  *    * {!String}    base_path The root directory where snapshots are saved.
  *    * {!PageQueue} queue     A PageQueue instance to store newly discovered
  *                             pages.
  *    * {=PageGraph} graph     A PageGraph instance that traks the site map.
  *    * {=Object}    logger    Instance of the logger to use.
+ *    * {!String}    base_url
+ *      The base URL of each page.
+ *      This includes things like the protocol, domain and port as well as
+ *      initial portion of each URI.
+ *      When using the StaticServer, this will look something like:
+ *      http://localhost:9000/
  */
 var SaveProcessor = module.exports = function SaveProcessor(options) {
     //base_url, base_path, queue, graph, logger) {
