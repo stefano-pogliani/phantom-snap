@@ -5,7 +5,7 @@ var Phantom = require("../../out/phantomjs/wrapper");
 suite("PhantomJS Wrapper", function() {
   setup(function() {
     this.phantom = new Phantom({
-      logger: require("../../out/loggers/silent")
+      //logger: require("../../out/loggers/verbose")
     });
   });
 

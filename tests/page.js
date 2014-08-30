@@ -75,6 +75,21 @@ suite("Advanced page tests", function() {
     });
   });
 
+  test("AppendTo", function(done) {
+    this.fetcher.fetch("get-html.html").then(function(page) {
+      return page.appendTo("head", "<base href='/'>").then(function() {
+        return page.getContent();
+      });
+    }).then(function(content) {
+      assert.equal(content, fs.readFileSync(
+          "./tests/fixtures/get-html-2-res.html", { encoding: "utf8" }
+      ));
+      done();
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
+
   test("Close", function(done) {
     this.fetcher.fetch("get-html.html").then(function(page) {
       return page.close().then(function() {

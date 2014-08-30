@@ -134,6 +134,27 @@ Controller.prototype.evaluate = function(var_args) {
 Controller.prototype._events = {};
 
 /**
+ * Appends HTML to an element.
+ * @param {!Object} data     Object with the paramenters of the appendTo method.
+ * @param {!Number} event_id The identifier of the event requesting the close.
+ */
+Controller.prototype._events.appendTo = function(data, event_id) {
+  var page = this._pages[data.page_id];
+  if (!page) {
+    this.emitFail(
+        event_id, "Invalid page identifier '" + data.page_id + "' for appendTo."
+    );
+    return;
+  }
+
+  page.evaluate(function(data) {
+    var container = document.querySelector(data.selector);
+    container.insertAdjacentHTML("beforeend", data.html);
+  }, data);
+  this.emit("done", event_id);
+};
+
+/**
  * Closes a page.
  * @param {!Number} page_id  The identifier of the page to close.
  * @param {!Number} event_id The identifier of the event requesting the close.
@@ -152,6 +173,11 @@ Controller.prototype._events.close = function(page_id, event_id) {
 
 /** The control server is ready to deal with me. */
 Controller.prototype._events.connected = function(data, event_id) {
+  // Ensure PID matched the server, if not terminate.
+  if (data !== system.pid) {
+    system.stderr.write("Server is expecting different process, terminating.");
+    phantom.exit(2);
+  }
   this.emit("ready", event_id);
 };
 
