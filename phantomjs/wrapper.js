@@ -150,6 +150,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
 
   // Register events so that their promises can be resolved.
   this._register(socket, "closed");
+  this._register(socket, "done");
   this._register(socket, "fetched");
   this._register(socket, "gotContent");
   this._register(socket, "links");
@@ -158,7 +159,7 @@ Phantom.prototype._handleSocketConnect = function(socket) {
   this._register(socket, "report-error");
 
   // Emit "connected" to trigger Phantom setup.
-  this.emit("connected").then(function() {
+  this.emit("connected", this._process.pid).then(function() {
     _this._ready.resolve(_this);
   });
 };
@@ -184,12 +185,33 @@ Phantom.prototype._handleStdOutData = function(chunck) {
  * @param {!Number} code The return code of Phantom.
  */
 Phantom.prototype._handlePhantomExit = function(code) {
+  if (code === 2) {
+    this._logger.info("A PhantomJS instance was terminated by PID miss-match.");
+    return;
+  }
+
   if (code) {
     this._logger.info("PhantomJS terminated with a non-zero code: %d.", code);
   }
   this._afterPhantomExits();
 };
 
+/**
+ * Appends HTML to an element.
+ * 
+ * @param {!Number} page_id  The id of the page into which the code is added.
+ * @param {!String} selector The CSS selector for the container element.
+ * @param {!String} html     The HTML to append to the seleced element.
+ * 
+ * @returns {!Q.Promise} A promise that resolves to the loaded page.
+ */
+Phantom.prototype.appendTo = function(page_id, selector, html) {
+  return this.emit("appendTo", {
+    html:     html,
+    page_id:  page_id,
+    selector: selector
+  });
+};
 
 /**
  * Requests to Phantom to fetch a new page.

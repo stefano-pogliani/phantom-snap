@@ -54,10 +54,13 @@ var CrawlingDriver = module.exports = function CrawlingDriver(options) {
   this._graph     = null;
   this._queue     = new PageQueue(queue_opts);
   this._server    = options.static ? new StaticServer(static_opts) : null;
-  this._processor = new SaveProcessor(
-      fetcher_opts.base_url, crawler_opts.base_path, this._queue, this._graph,
-      global_opts.logger
-  );
+  this._processor = new SaveProcessor({
+    base_url:  fetcher_opts.base_url,
+    base_path: crawler_opts.base_path,
+    graph:     this._graph,
+    logger:    global_opts.logger,
+    queue:     this._queue
+  });
 };
 
 /**

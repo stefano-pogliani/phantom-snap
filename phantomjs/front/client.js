@@ -48,6 +48,7 @@ define(function(require) {
 
     // Register known events from server.
     registerEvent("exit");
+    registerIdentifiedEvent("appendTo");
     registerIdentifiedEvent("close");
     registerIdentifiedEvent("connected");
     registerIdentifiedEvent("debug");

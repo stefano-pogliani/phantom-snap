@@ -65,6 +65,18 @@ Page.prototype._verifyPhantom = function() {
 };
 
 /**
+ * Appends HTML to this page after the specified element.
+ * @param {!String} selector CSS selector for the container element.
+ * @param {!String} html     HTML string to append to the container.
+ * @returns {Q.Promise} A promise that resolves when done.
+ */
+Page.prototype.appendTo = function(selector, html) {
+  return this._verifyPhantom().then(function(page) {
+    return page._phantom.appendTo(page._phantom_id, selector, html);
+  });
+};
+
+/**
  * Closes the page on Phantom and cleans up references.
  * @returns {Q.Promise} A promise that resolves when the page is closed.
  */
