@@ -16,20 +16,26 @@ var Base = require("./base");
  *   When using the StaticServer, this will look something like:
  *   http://localhost:9000/
  *
- * @param {!String}    base_path The root directory where snapshots are saved.
- * @param {!PageQueue} queue     A PageQueue instance to store newly discovered
- *                               pages.
- * @param {=PageGraph} graph     A PageGraph instance that traks the site map.
- * @param {=Object}    logger    Instance of the logger to use.
+ * @param {!Object} options
+ *  Object with the following options:
+ *    * {=String}    base_href Href value for the optional base tag.
+ *                             Tag is added only if this is specified.
+ *    * {=String}    base_url  The url to start crawling.
+ *    * {!String}    base_path The root directory where snapshots are saved.
+ *    * {!PageQueue} queue     A PageQueue instance to store newly discovered
+ *                             pages.
+ *    * {=PageGraph} graph     A PageGraph instance that traks the site map.
+ *    * {=Object}    logger    Instance of the logger to use.
  */
-var SaveProcessor = module.exports = function SaveProcessor(
-    base_url, base_path, queue, graph, logger) {
+var SaveProcessor = module.exports = function SaveProcessor(options) {
+    //base_url, base_path, queue, graph, logger) {
   Base.call(this);
-  this._base_url  = base_url || "http://localhost:8080/";
-  this._base_path = base_path;
-  this._graph     = graph;
-  this._logger    = logger || require("../loggers/default");
-  this._queue     = queue;
+  this._base_href = options.base_href || null;
+  this._base_url  = options.base_url || "http://localhost:8080/";
+  this._base_path = options.base_path;
+  this._graph     = options.graph;
+  this._logger    = options.logger || require("../loggers/default");
+  this._queue     = options.queue;
 };
 Base.extendConstructor(SaveProcessor);
 
@@ -51,8 +57,19 @@ SaveProcessor.prototype.process = function(page) {
   var out_file = path.join(
       this._base_path, page.uri === "/" ? "index.html" : page.uri);
   var dir      = path.dirname(out_file);
+  var start    = null;
 
-  return page.getContent().then(function(content) {
+  if (this._base_href) {
+    start = page.appendTo("head", "<base href='" + this._base_href + "'>");
+  } else {
+    var def = Q.defer();
+    start   = def.promise;
+    def.resolve();
+  }
+
+  return start.then(function() {
+    return page.getContent();
+  }).then(function(content) {
     _this._logger.debug("Checking existence of '%s' ...", dir);
 
     return Q.nfcall(fs.stat, dir).then(function(stat) {

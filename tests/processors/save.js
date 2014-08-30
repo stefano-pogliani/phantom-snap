@@ -50,10 +50,48 @@ suite("Processors > Save", function() {
     });
   });
 
+  test("nested paths", function(done) {
+    var graph     = new MockGraph();
+    var queue     = new MockQueue();
+    var processor = new Save({
+      base_url:  this._base_url,
+      base_path: __dirname,
+      graph:     graph,
+      queue:     queue
+    });
+
+    this.fetcher.fetch("nested/get-html.html").then(function(page) {
+      return processor.process(page);
+    }).then(function() {
+
+      // Assert file.
+      var encoding = { encoding: "utf8" };
+      assert.equal(
+          fs.readFileSync(path.join(__dirname, "nested", "get-html.html"),
+                          encoding),
+          fs.readFileSync("./tests/fixtures/get-html-res.html", encoding)
+      );
+
+      // Delete saved file and its directory.
+      fs.unlinkSync(path.join(__dirname, "nested", "get-html.html"));
+      fs.rmdirSync(path.join(__dirname, "nested"));
+
+      done();
+    }).fail(function(ex) {
+      done(ex);
+    });
+  });
+
   test("process", function(done) {
     var graph     = new MockGraph();
     var queue     = new MockQueue();
-    var processor = new Save(this._base_url, __dirname, queue, graph);
+    var processor = new Save({
+      base_url:  this._base_url,
+      base_path: __dirname,
+      graph:     graph,
+      queue:     queue
+    });
+
     this.fetcher.fetch("links.html").then(function(page) {
       return processor.process(page);
     }).then(function() {
@@ -86,28 +124,46 @@ suite("Processors > Save", function() {
       done(ex);
     });
   });
-
-  test("nested paths", function(done) {
+  
+  test("process base uri", function(done) {
     var graph     = new MockGraph();
     var queue     = new MockQueue();
-    var processor = new Save(this._base_url, __dirname, queue, graph);
-    this.fetcher.fetch("nested/get-html.html").then(function(page) {
+    var processor = new Save({
+      base_href: "/",
+      base_url:  this._base_url,
+      base_path: __dirname,
+      graph:     graph,
+      queue:     queue
+    });
+
+    this.fetcher.fetch("links.html").then(function(page) {
       return processor.process(page);
     }).then(function() {
 
       // Assert file.
       var encoding = { encoding: "utf8" };
       assert.equal(
-          fs.readFileSync(path.join(__dirname, "nested", "get-html.html"),
-                          encoding),
-          fs.readFileSync("./tests/fixtures/get-html-res.html", encoding)
+          fs.readFileSync("./tests/fixtures/links-base-res.html", encoding),
+          fs.readFileSync(path.join(__dirname, "links.html"), encoding)
       );
+      fs.unlinkSync(path.join(__dirname, "links.html"));
 
-      // Delete saved file and its directory.
-      fs.unlinkSync(path.join(__dirname, "nested", "get-html.html"));
-      fs.rmdirSync(path.join(__dirname, "nested"));
+      // Assert elements in queue.
+      assert.deepEqual(queue.queue, [{
+        uri:   "internal",
+        depth: 1
+      }]);
 
+      // Assert graph updated.
+      assert.deepEqual(graph.edges, [{
+        uri:  "links.html",
+        link: {
+          href:  "internal",
+          title: "Internal"
+        }
+      }]);
       done();
+
     }).fail(function(ex) {
       done(ex);
     });
