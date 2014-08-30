@@ -38,11 +38,18 @@ var StaticServer  = require("../static-server");
  */
 var CrawlingDriver = module.exports = function CrawlingDriver(options) {
   // Build sub-component options.
-  var global_opts  = _.extend({}, options.global);
-  var crawler_opts = _.extend({}, global_opts, options.crawler);
-  var fetcher_opts = _.extend({}, global_opts, options.fetcher);
-  var queue_opts   = _.extend({}, global_opts, options.queue);
-  var static_opts  = _.extend({}, global_opts, options.static);
+  var global_opts    = _.extend({}, options.global);
+  var crawler_opts   = _.extend({}, global_opts, options.crawler);
+  var fetcher_opts   = _.extend({}, global_opts, options.fetcher);
+  var queue_opts     = _.extend({}, global_opts, options.queue);
+  var static_opts    = _.extend({}, global_opts, options.static);
+  var processor_opts = _.extend({}, global_opts, options.processor, {
+    base_url:  fetcher_opts.base_url,
+    base_path: crawler_opts.base_path,
+    graph:     this._graph,
+    logger:    global_opts.logger,
+    queue:     this._queue
+  });
 
   // Store options for later.
   this._index  = crawler_opts.index  || "index.html";
@@ -54,13 +61,7 @@ var CrawlingDriver = module.exports = function CrawlingDriver(options) {
   this._graph     = null;
   this._queue     = new PageQueue(queue_opts);
   this._server    = options.static ? new StaticServer(static_opts) : null;
-  this._processor = new SaveProcessor({
-    base_url:  fetcher_opts.base_url,
-    base_path: crawler_opts.base_path,
-    graph:     this._graph,
-    logger:    global_opts.logger,
-    queue:     this._queue
-  });
+  this._processor = new SaveProcessor(processor_opts);
 };
 
 /**
