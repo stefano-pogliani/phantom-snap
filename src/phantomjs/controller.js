@@ -79,9 +79,10 @@ Controller.prototype.connect = function() {
  * @returns {!Object} A new Phantom page.
  */
 Controller.prototype.createPage = function() {
-  var page = webpage.create();
+  var package = require("../package");
+  var page    = webpage.create();
 
-  page.settings.userAgent = "PhantomSnap";
+  page.settings.userAgent = "PhantomSnap v" + package.version;
   page.onInitialized = function() {
     patchPage(page);
   };
